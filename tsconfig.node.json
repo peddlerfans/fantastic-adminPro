@@ -1,11 +1,22 @@
 {
   "compilerOptions": {
+    "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2022",
-    "lib": ["ES2023"],
+    "lib": [
+      "ES2023"
+    ],
     "moduleDetection": "force",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "#/*": [
+        "./src/types/*"
+      ]
+    },
     "allowImportingTsExtensions": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
@@ -19,6 +30,7 @@
   "include": [
     "package.json",
     "vite.config.ts",
-    "vite/**/*.ts"
+    "vite/**/*.ts",
+    "src/**/*.vue"
   ]
 }

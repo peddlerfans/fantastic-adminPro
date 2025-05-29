@@ -20,6 +20,67 @@
           "page2": "Navigation 2-2-2"
         }
       }
+    },
+    "dashboard": {
+      "root": "Dashboard",
+      "user": "User Report",
+      "device": "Device Report",
+      "recharge": "Recharge Report",
+      "withdraw": "Withdraw Report",
+      "smart": "Smart Report",
+      "reward": "Reward Report"
+    },
+    "user": {
+      "root": "User Management",
+      "list": "User List",
+      "detail": "User Detail",
+      "edit": "Edit User",
+      "address": "User Address",
+      "ipAddress": "User IP Address",
+      "role": "Role Management",
+      "permission": "Permission Management",
+      "profile": "User Profile",
+      "settings": "User Settings"
+    },
+    "finance": {
+      "root": "Finance",
+      "index": "Recharge Record",
+      "transfer": "Transfer Record",
+      "withdraw": "Withdrawal Record",
+      "point": "Point Record",
+      "token": "Token Record",
+      "step": "Step Record"
+    },
+    "model": {
+      "root": "Model List",
+      "eliteList": "Elite List",
+      "aiDeviceList": "AI Device List",
+      "deviceList": "Device List",
+      "insuranceList": "Insurance List",
+      "33221List": "33221 Plan"
+    },
+    "ecommerce": {
+      "root": "E-commerce",
+      "index": "E-commerce Home"
+    },
+    "activity": {
+      "root": "Activity Management",
+      "list": "Activity List",
+      "detail": "Activity Detail",
+      "edit": "Edit Activity",
+      "type": "Activity Type Management"
+    },
+    "system": {
+      "root": "System Settings",
+      "settings": "Settings",
+      "log": "Log",
+      "config": "Config",
+      "operation": "Operation Log"
+    },
+    "new": {
+      "root": "New Module",
+      "list": "New Module List",
+      "detail": "New Module Detail"
     }
   }
 }

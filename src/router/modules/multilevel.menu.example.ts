@@ -13,6 +13,7 @@ const routes: RouteRecordRaw = {
   meta: {
     title: $t('route.multimenu.root'),
     icon: 'i-heroicons-solid:menu-alt-3',
+    defaultOpened: true,
   },
   children: [
     {

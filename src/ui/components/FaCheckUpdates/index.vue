@@ -17,92 +17,92 @@ en:
 </i18n>
 
 <script setup lang="ts">
-import useSettingsStore from '@/store/modules/settings'
-import { useFaModal } from '@/ui/components/FaModal'
-import { useI18n } from 'vue-i18n'
+import useSettingsStore from "@/store/modules/settings";
+import { useFaModal } from "@/ui/components/FaModal";
+import { useI18n } from "vue-i18n";
 
 defineOptions({
-  name: 'FaCheckUpdates',
-})
+  name: "FaCheckUpdates",
+});
 
-const { t } = useI18n()
-const settingsStore = useSettingsStore()
+const { t } = useI18n();
+const settingsStore = useSettingsStore();
 
-const visible = ref(false)
-const lastVersionTag = ref('')
-const checkUpdatesInterval = ref(Number.NaN)
+const visible = ref(false);
+const lastVersionTag = ref("");
+const checkUpdatesInterval = ref(Number.NaN);
 
 async function getVersionTag() {
   try {
     const response = await fetch(`${location.origin}${location.pathname}`, {
-      cache: 'no-cache',
-      method: 'HEAD',
-    })
-    return response.headers.get('etag') || response.headers.get('last-modified')
-  }
-  catch {
-    console.error('检查更新失败')
+      cache: "no-cache",
+      method: "HEAD",
+    });
+    return (
+      response.headers.get("etag") || response.headers.get("last-modified")
+    );
+  } catch {
+    console.error("检查更新失败");
   }
 }
 
 async function checkUpdates() {
-  const versionTag = await getVersionTag()
+  const versionTag = await getVersionTag();
   if (!versionTag) {
-    return
+    return;
   }
   if (!lastVersionTag.value) {
-    lastVersionTag.value = versionTag
-    return
+    lastVersionTag.value = versionTag;
+    return;
   }
   if (visible.value) {
-    return
+    return;
   }
   if (lastVersionTag.value !== versionTag && versionTag) {
-    stopInterval()
-    visible.value = true
+    stopInterval();
+    visible.value = true;
     useFaModal().confirm({
-      title: t('message'),
-      content: t('description'),
-      confirmButtonText: t('confirm'),
-      cancelButtonText: t('cancel'),
+      title: t("message"),
+      content: t("description"),
+      confirmButtonText: t("confirm"),
+      cancelButtonText: t("cancel"),
       onConfirm: () => location.reload(),
-    })
+    });
   }
 }
 
 function startInterval() {
-  checkUpdates()
-  checkUpdatesInterval.value = window.setInterval(checkUpdates, 60_000)
+  checkUpdates();
+  checkUpdatesInterval.value = window.setInterval(checkUpdates, 60_000);
 }
 
 function stopInterval() {
-  clearInterval(checkUpdatesInterval.value)
+  clearInterval(checkUpdatesInterval.value);
 }
 
 function handleVisibilitychange() {
   if (document.hidden) {
-    stop()
-  }
-  else {
+    stop();
+  } else {
     checkUpdates().finally(() => {
-      startInterval()
-    })
+      startInterval();
+    });
   }
 }
 
 onMounted(() => {
   if (import.meta.env.PROD && settingsStore.settings.app.enableCheckUpdates) {
-    startInterval()
-    document.addEventListener('visibilitychange', handleVisibilitychange)
+    startInterval();
+    document.addEventListener("visibilitychange", handleVisibilitychange);
   }
-})
+});
 
 onUnmounted(() => {
   if (import.meta.env.PROD && settingsStore.settings.app.enableCheckUpdates) {
-    stopInterval()
-    document.removeEventListener('visibilitychange', handleVisibilitychange)
+    stopInterval();
+    document.removeEventListener("visibilitychange", handleVisibilitychange);
   }
-})
+});
 </script>
 
 <template>

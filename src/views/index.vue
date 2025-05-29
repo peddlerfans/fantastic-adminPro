@@ -5,6 +5,8 @@ meta:
 </route>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+
 const versionType = ref('pro')
 watch(versionType, (val) => {
   if (val === 'basic') {

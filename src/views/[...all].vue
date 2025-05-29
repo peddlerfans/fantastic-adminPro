@@ -9,6 +9,8 @@ meta:
 <script setup lang="ts">
 import useSettingsStore from '@/store/modules/settings'
 import useTabbarStore from '@/store/modules/tabbar'
+import { onMounted, ref } from 'vue'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()

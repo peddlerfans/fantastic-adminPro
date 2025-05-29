@@ -5,7 +5,15 @@ import pinia from '@/store'
 import useSettingsStore from '@/store/modules/settings'
 import generatedRoutes from 'virtual:generated-pages'
 import { setupLayouts } from 'virtual:meta-layouts'
+import ActivityModule from './modules/activity.module'
+import DashboardModule from './modules/dashboard.module'
+import EcommerceModule from './modules/ecommerce.module'
+import FinanceModule from './modules/finance.module'
+import ModelModule from './modules/model.module'
 import MultilevelMenuExample from './modules/multilevel.menu.example'
+import NewModule from './modules/new.module'
+import SystemModule from './modules/system.module'
+import UserModule from './modules/user.module'
 
 // 固定路由（默认路由）
 const constantRoutes: RouteRecordRaw[] = [
@@ -13,6 +21,7 @@ const constantRoutes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: () => import('@/views/login.vue'),
+    // Make sure that src/views/login.vue exists, or update the path if the file is located elsewhere.
     meta: {
       whiteList: true,
       title: $t('app.route.login'),
@@ -39,7 +48,7 @@ const systemRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('@/views/index.vue'),
+        component: () => import('@/views/dashboard/user.vue'),
         meta: {
           title: $t(useSettingsStore(pinia).settings.home.title),
           icon: 'i-ant-design:home-twotone',
@@ -63,11 +72,74 @@ const systemRoutes: RouteRecordRaw[] = [
 const asyncRoutes: Route.recordMainRaw[] = [
   {
     meta: {
-      title: '演示',
+      title: '首页报表',
       icon: 'i-uim:box',
     },
     children: [
-      MultilevelMenuExample,
+      DashboardModule,
+    ],
+  },
+  {
+    meta: {
+      title: '用户列表',
+      icon: 'i-uim:box',
+    },
+    children: [
+      UserModule,
+    ],
+  },
+  {
+    meta: {
+      title: '资金流水',
+      icon: 'i-uim:box',
+    },
+    children: [
+      FinanceModule,
+    ],
+  },
+  {
+    meta: {
+      title: '模式列表',
+      icon: 'i-uim:box',
+    },
+    children: [
+      ModelModule,
+    ],
+  },
+  {
+    meta: {
+      title: '电商管理',
+      icon: 'i-uim:box',
+    },
+    children: [
+      EcommerceModule,
+    ],
+  },
+  {
+    meta: {
+      title: '活动列表',
+      icon: 'i-uim:box',
+    },
+    children: [
+      ActivityModule,
+    ],
+  },
+  {
+    meta: {
+      title: '系统设置',
+      icon: 'i-uim:box',
+    },
+    children: [
+      SystemModule,
+    ],
+  },
+  {
+    meta: {
+      title: '新模块',
+      icon: 'i-uim:box',
+    },
+    children: [
+      NewModule,
     ],
   },
 ]

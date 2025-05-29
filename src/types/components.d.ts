@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CrudTable: typeof import('./../components/CrudTable/index.vue')['default']
     FaAnimatedBeam: typeof import('./../ui/components/FaAnimatedBeam/index.vue')['default']
     FaAuth: typeof import('./../ui/components/FaAuth/index.vue')['default']
     FaAvatar: typeof import('./../ui/components/FaAvatar/index.vue')['default']
@@ -81,5 +82,6 @@ declare module 'vue' {
     PcasCascader: typeof import('./../components/PcasCascader/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Table: typeof import('./../components/Table/index.vue')['default']
   }
 }

@@ -1,7 +1,8 @@
 // 加载 iconify 图标
-import { downloadAndInstall } from '@/iconify'
-
 import icons from '@/iconify/index.json'
+
+import { downloadAndInstall } from '@/iconify/index.ts'
+
 // 自定义指令
 import directive from '@/utils/directive'
 

@@ -48,9 +48,10 @@ export default defineConfig(({ mode, command }) => {
     plugins: createVitePlugins(mode, command === 'build'),
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src'),
+        '@': path.resolve(__dirname, './src'),
         '#': path.resolve(__dirname, 'src/types'),
       },
+      extensions: ['.js', '.json', '.ts'],
     },
     css: {
       preprocessorOptions: {

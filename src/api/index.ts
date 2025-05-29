@@ -1,11 +1,11 @@
-import useSettingsStore from '@/store/modules/settings'
-import useUserStore from '@/store/modules/user'
 import axios from 'axios'
-// import qs from 'qs'
 import { toast } from 'vue-sonner'
+import useSettingsStore from '@/store/modules/settings'
+// import qs from 'qs'
+import useUserStore from '@/store/modules/user'
 
 const api = axios.create({
-  baseURL: (import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY) ? '/proxy/' : import.meta.env.VITE_APP_API_BASEURL,
+  baseURL: '/proxy/',
   timeout: 1000 * 60,
   responseType: 'json',
 })
@@ -14,13 +14,14 @@ api.interceptors.request.use(
   (request) => {
     // 全局拦截请求发送前提交的参数
     const settingsStore = useSettingsStore()
-    const userStore = useUserStore()
+    // const userStore = useUserStore() // 注释未使用变量
     // 设置请求头
     if (request.headers) {
       request.headers['Accept-Language'] = settingsStore.lang
-      if (userStore.isLogin) {
-        request.headers.Token = userStore.token
-      }
+      request.headers.Authorization = 'Bearer testToken123123123123123132'
+      // if (userStore.isLogin) {
+      //   request.headers.Token = userStore.token
+      // }
     }
     // 是否将 POST 请求参数进行字符串化处理
     if (request.method === 'post') {
@@ -48,8 +49,17 @@ api.interceptors.response.use(
         return Promise.reject(response.data)
       }
     }
-    else {
+    else if (response.data.status === 0 && response.data.error === '登录失效') {
+      // 只有明确登录失效才登出
       useUserStore().requestLogout()
+    }
+    else {
+      // 其它情况只弹错误提示，不强制登出
+      toast.error('Error', {
+        description: response.data.error || '接口异常',
+      })
+      // return Promise.reject(response.data)
+      return Promise.resolve(response.data)
     }
     return Promise.resolve(response.data)
   },

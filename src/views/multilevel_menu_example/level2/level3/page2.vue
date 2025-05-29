@@ -4,9 +4,7 @@ meta:
 </route>
 
 <template>
-  <div>
-    <FaPageMain>
-      多级导航2-2-2
-    </FaPageMain>
-  </div>
+  <FaCard title="多级菜单-三级页面2">
+    <div>这是多级菜单的三级页面2内容。</div>
+  </FaCard>
 </template>

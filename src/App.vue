@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { computed, nextTick, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
+
 import useSettingsStore from '@/store/modules/settings'
 import dayjs from '@/utils/dayjs'
 import { ua } from '@/utils/ua'
-import { useI18n } from 'vue-i18n'
 import Provider from './ui/provider/index.vue'
+
 import 'dayjs/locale/en'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/zh-tw'

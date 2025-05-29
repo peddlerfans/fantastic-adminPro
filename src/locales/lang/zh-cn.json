@@ -20,6 +20,73 @@
           "page2": "导航2-2-2"
         }
       }
+    },
+    "dashboard": {
+      "root": "首页报表",
+      "user": "用户报表",
+      "device": "设备报表",
+      "recharge": "充值报表",
+      "withdraw": "提现报表",
+      "smart": "智算报表",
+      "reward": "奖励报表"
+    },
+    "user": {
+      "root": "用户管理",
+      "list": "用户列表",
+      "detail": "网体列表",
+      "edit": "用户资产",
+      "address": "用户地址",
+      "ipAddress": "用户IP地址",
+      "role": "角色管理",
+      "permission": "权限管理",
+      "profile": "用户详情",
+      "settings": "用户设置"
+    },
+    "finance": {
+      "root": "资金流水",
+      "index": "充值记录",
+      "transfer": "划转记录",
+      "withdraw": "提现记录",
+      "point": "积分记录",
+      "token": "代币记录",
+      "step": "步数记录"
+    },
+    "model": {
+      "root": "模式列表",
+      "eliteList": "精英榜",
+      "aiDeviceList": "智算设备",
+      "deviceList": "设备列表",
+      "insuranceList": "保险列表",
+      "33221List": "33221计划"
+    },
+    "ecommerce": {
+      "root": "电商管理",
+      "index": "商品列表",
+      "detail": "商品详情",
+      "edit": "编辑商品",
+      "order": "订单管理",
+      "orderDetail": "订单详情",
+      "customer": "客户管理",
+      "customerDetail": "客户详情"
+    },
+    "activity": {
+      "root": "活动管理",
+      "list": "活动列表",
+      "detail": "活动详情",
+      "edit": "编辑活动",
+      "type": "活动类型管理"
+    },
+    "system": {
+      "root": "系统设置",
+      "settings": "设置",
+      "log": "日志",
+      "config": "参数配置",
+      "operation": "操作记录"
+    },
+    "new": {
+      "root": "新模块",
+      "list": "新模块列表",
+      "detail": "新模块详情"
     }
   }
 }

@@ -20,6 +20,67 @@
           "page2": "導航2-2-2"
         }
       }
+    },
+    "dashboard": {
+      "root": "首頁報表",
+      "user": "用戶報表",
+      "device": "設備報表",
+      "recharge": "充值報表",
+      "withdraw": "提現報表",
+      "smart": "智算報表",
+      "reward": "獎勵報表"
+    },
+    "user": {
+      "root": "用戶管理",
+      "list": "用戶列表",
+      "detail": "用戶詳情",
+      "edit": "編輯用戶",
+      "address": "用戶地址",
+      "ipAddress": "用戶IP地址",
+      "role": "角色管理",
+      "permission": "權限管理",
+      "profile": "用戶詳情",
+      "settings": "用戶設置"
+    },
+    "finance": {
+      "root": "資金流水",
+      "index": "充值記錄",
+      "transfer": "划转記錄",
+      "withdraw": "提現記錄",
+      "point": "積分記錄",
+      "token": "代幣記錄",
+      "step": "步數記錄"
+    },
+    "model": {
+      "root": "模式列表",
+      "eliteList": "精英榜",
+      "aiDeviceList": "智算設備",
+      "deviceList": "設備列表",
+      "insuranceList": "保險列表",
+      "33221List": "33221計劃"
+    },
+    "ecommerce": {
+      "root": "電商管理",
+      "index": "電商首頁"
+    },
+    "activity": {
+      "root": "活動管理",
+      "list": "活動列表",
+      "detail": "活動詳情",
+      "edit": "編輯活動",
+      "type": "活動類型管理"
+    },
+    "system": {
+      "root": "系統設置",
+      "settings": "設置",
+      "log": "日誌",
+      "config": "參數配置",
+      "operation": "操作記錄"
+    },
+    "new": {
+      "root": "新模塊",
+      "list": "新模塊列表",
+      "detail": "新模塊詳情"
     }
   }
 }

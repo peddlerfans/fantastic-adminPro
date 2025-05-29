@@ -53,13 +53,13 @@ const globalSettingsDefault: RecursiveRequired<Settings.all> = {
     switchTabbarAndToolbar: false,
   },
   tabbar: {
-    enable: false,
-    style: '',
-    enableIcon: false,
+    enable: true,
+    style: 'fashion',
+    enableIcon: true,
     dblclickAction: 'close',
     mergeTabsBy: '',
-    enableMemory: false,
-    enableHotkeys: false,
+    enableMemory: true,
+    enableHotkeys: true,
     storageTo: 'local',
   },
   toolbar: {

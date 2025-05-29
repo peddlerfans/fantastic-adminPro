@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@vee-validate/zod": "^4.15.0",
+    "@visactor/vchart": "^1.13.10",
     "@vueuse/components": "^13.0.0",
     "@vueuse/core": "^13.0.0",
     "@vueuse/integrations": "^13.0.0",
