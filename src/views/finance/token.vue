@@ -1,67 +1,95 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
+import type { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import newApi from "@/api/modules/new"
 import CrudTable from '@/components/CrudTable/index.vue'
 
-// 代币来源选项
-const tokenSourceOptions = [
-  { label: '确权产生', value: '确权产生' },
-]
+interface TokenRecord {
+  email: string
+  accountAddress: string
+  type: string
+  type2: string
+  amount: number
+  createTime: string
+}
 
-// 代币记录表格列
-const tokenColumns = [
-  { prop: 'email', label: '用户邮箱', minWidth: 140 },
-  { prop: 'address', label: '用户地址', minWidth: 140 },
-  { prop: 'source', label: '代币来源', minWidth: 120 },
-  { prop: 'amount', label: '代币数量', minWidth: 100 },
-  { prop: 'createdAt', label: '时间', minWidth: 140 },
-]
+interface TokenResponse {
+  records: TokenRecord[]
+  total: number
+}
+
+interface RequestParams {
+  type?: string
+  type2?: string
+  accountAddress?: string
+  current?: number
+  size?: number
+}
+
+// 表格列配置
+const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  { prop: 'type', label: '代币来源类型', minWidth: 120 },
+  { prop: 'type2', label: '代币来源细分类型', minWidth: 120 },
+  {
+    prop: 'amount',
+    label: '代币数量',
+    minWidth: 120,
+    formatter: (row: TokenRecord) => {
+      return row.amount ? row.amount.toLocaleString() : '-'
+    }
+  },
+  {
+    prop: 'createTime',
+    label: '创建时间',
+    minWidth: 160,
+    formatter: (row: TokenRecord) => {
+      if (!row.createTime) return '-'
+      return new Date(row.createTime).toLocaleString()
+    }
+  },
+])
 
 // 查询项
-const tokenSearchItems = [
-  { key: 'address', label: '用户地址', component: 'ElInput', placeholder: '请输入用户地址' },
-  { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'source', label: '代币来源', component: 'ElSelect', options: tokenSourceOptions, placeholder: '请选择代币来源', clearable: true },
-]
+const searchItems = ref([
+  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  { key: 'type', label: '代币来源类型', component: 'ElInput', placeholder: '请输入代币来源类型' },
+  { key: 'type2', label: '代币来源细分类型', component: 'ElInput', placeholder: '请输入代币来源细分类型' },
+])
 
-// mock 数据
-const tokenMockList = Array.from({ length: 20 }).map((_, i) => ({
-  email: `user${i + 1}@example.com`,
-  address: `0x${Math.random().toString(16).slice(2, 18)}`,
-  source: '确权产生',
-  amount: Math.floor(Math.random() * 1000),
-  createdAt: `2024-06-0${(i % 9) + 1} 10:00:00`,
-}))
-
-// 数据请求（带筛选）
-function tokenRequestData(params: any) {
-  let list = [...tokenMockList]
-  if (params.address) {
-    list = list.filter(item => item.address.includes(params.address))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  if (params.source) {
-    list = list.filter(item => item.source === params.source)
-  }
-  // 分页
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return newApi.tokenList({
+    type: params.type,
+    type2: params.type2,
+    accountAddress: params.accountAddress,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<TokenResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取代币记录失败:', error)
+    return {
+      data: {
+        list: [] as TokenRecord[],
+        total: 0,
+      }
     }
   })
 }
 </script>
 
 <template>
-  <FaCard title="CCT代币记录" class="mt-4">
+  <FaCard title="代币记录">
     <CrudTable
-      :columns="tokenColumns"
-      :search-items="tokenSearchItems"
-      :request="tokenRequestData"
+      :columns="columns"
+      :search-items="searchItems"
+      :request="requestData"
       :batch-enabled="false"
     />
   </FaCard>

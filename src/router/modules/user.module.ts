@@ -25,16 +25,16 @@ const routes: RouteRecordRaw = {
       },
     },
     {
-      path: 'detail/:id',
+      path: 'detail',
       name: 'userDetail',
-      component: () => import('@/views/user/netList.vue'),
+      component: () => import('@/views/user/detail.vue'),
       meta: {
         title: $t('route.user.detail'),
         hidden: true,
       },
     },
     {
-      path: 'edit/:id',
+      path: 'edit',
       name: 'userEdit',
       component: () => import('@/views/user/assets.vue'),
       meta: {

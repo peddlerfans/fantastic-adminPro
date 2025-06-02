@@ -1,60 +1,95 @@
-<script lang="ts" setup>
+<!-- eslint-disable no-console -->
+<script setup lang="ts">
+import type { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import newApi from "@/api/modules/new"
 import CrudTable from '@/components/CrudTable/index.vue'
 
+interface RechargeRecord {
+  email: string
+  accountAddress: string
+  rechargeAddress: string
+  amount: number
+  hash: string
+  createTime: string
+}
+
+interface RechargeResponse {
+  records: RechargeRecord[]
+  total: number
+}
+
+interface RequestParams {
+  email?: string
+  accountAddress?: string
+  current?: number
+  size?: number
+}
+
 // 表格列配置
-const columns = [
-  { prop: 'email', label: '邮箱', minWidth: 140 },
-  { prop: 'walletAddress', label: '用户钱包地址', minWidth: 140 },
-  { prop: 'rechargeAddress', label: '充值地址', minWidth: 140 },
-  { prop: 'usdt', label: 'USDT数量', minWidth: 100 },
-  { prop: 'hash', label: '哈希', minWidth: 180 },
-  { prop: 'createdAt', label: '时间', minWidth: 140 },
-]
+const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '主账户地址', minWidth: 180 },
+  { prop: 'rechargeAddress', label: '充值地址', minWidth: 180 },
+  {
+    prop: 'amount',
+    label: '充值金额',
+    minWidth: 120,
+    formatter: (row: RechargeRecord) => {
+      return row.amount ? row.amount.toFixed(8) : '-'
+    }
+  },
+  { prop: 'hash', label: '交易哈希', minWidth: 220 },
+  {
+    prop: 'createTime',
+    label: '充值时间',
+    minWidth: 160,
+    formatter: (row: RechargeRecord) => {
+      if (!row.createTime) return '-'
+      return new Date(row.createTime).toLocaleString()
+    }
+  },
+])
 
 // 查询项
-const searchItems = [
-  { key: 'walletAddress', label: '用户钱包地址', component: 'ElInput', placeholder: '请输入用户钱包地址' },
-  { key: 'email', label: '邮箱', component: 'ElInput', placeholder: '请输入邮箱' },
-]
+const searchItems = ref([
+  { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
+  { key: 'accountAddress', label: '主账户地址', component: 'ElInput', placeholder: '请输入主账户地址' },
+])
 
-// mock 数据
-const mockList = Array.from({ length: 10 }).map((_, i) => ({
-  email: `user${i + 1}@example.com`,
-  walletAddress: `0x${Math.random().toString(16).slice(2, 18)}`,
-  rechargeAddress: `充值地址${i + 1}`,
-  usdt: Math.floor(Math.random() * 1000),
-  hash: `0x${Math.random().toString(16).slice(2, 18)}`,
-  createdAt: `2024-06-0${(i % 9) + 1} 10:00:00`,
-}))
-
-// 数据请求（带筛选）
-function requestData(params: any) {
-  let list = [...mockList]
-  if (params.walletAddress) {
-    list = list.filter(item => item.walletAddress.includes(params.walletAddress))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  // 分页
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return newApi.rechargeList({
+    email: params.email,
+    accountAddress: params.accountAddress,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<RechargeResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取充值记录失败:', error)
+    return {
+      data: {
+        list: [] as RechargeRecord[],
+        total: 0,
+      }
     }
   })
 }
 </script>
 
 <template>
-  <div>
-    <FaCard title="充值记录" class="mt-4">
-      <CrudTable :columns="columns" :search-items="searchItems" :request="requestData" :batch-enabled="false" />
-    </FaCard>
-  </div>
+  <FaCard title="充值记录">
+    <CrudTable
+      :columns="columns"
+      :search-items="searchItems"
+      :request="requestData"
+      :batch-enabled="false"
+    />
+  </FaCard>
 </template>
 
 <style scoped>

@@ -1,71 +1,121 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
-// import { ref } from 'vue'
+import type { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import newApi from "@/api/modules/new"
 import CrudTable from '@/components/CrudTable/index.vue'
 
-// 积分来源选项
-const sourceOptions = [
-  { label: '设备采集', value: '设备采集' },
-  { label: '分佣', value: '分佣' },
-  { label: '确权', value: '确权' },
-  { label: '智算设备', value: '智算设备' },
+interface PointRecord {
+  email: string
+  accountAddress: string
+  type: string
+  type2: string
+  amount: number
+  createTime: string
+}
+
+interface PointResponse {
+  records: PointRecord[]
+  total: number
+}
+
+interface RequestParams {
+  type?: string
+  type2?: string
+  email?: string
+  accountAddress?: string
+  current?: number
+  size?: number
+}
+
+// 积分来源类型选项
+const pointTypeOptions = [
+  { label: '步数', value: 'step' },
+  { label: '兑换', value: 'exchange' },
+  { label: '扣除', value: 'deduct' },
+  { label: '佣金', value: 'commision' },
 ]
 
-// 积分记录表格列
-const scoreColumns = [
-  { prop: 'email', label: '用户邮箱', minWidth: 140 },
-  { prop: 'address', label: '用户地址', minWidth: 140 },
-  { prop: 'source', label: '积分来源', minWidth: 120 },
-  { prop: 'amount', label: '积分数量', minWidth: 100 },
-  { prop: 'createdAt', label: '时间', minWidth: 140 },
-]
+// 表格列配置
+const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  {
+    prop: 'type',
+    label: '积分来源类型',
+    minWidth: 120,
+    formatter: (row: PointRecord) => {
+      const option = pointTypeOptions.find(opt => opt.value === row.type)
+      return option ? option.label : row.type
+    }
+  },
+  { prop: 'type2', label: '积分子类型', minWidth: 120 },
+  {
+    prop: 'amount',
+    label: '积分数量',
+    minWidth: 120,
+    formatter: (row: PointRecord) => {
+      return row.amount ? row.amount.toLocaleString() : '-'
+    }
+  },
+  {
+    prop: 'createTime',
+    label: '创建时间',
+    minWidth: 160,
+    formatter: (row: PointRecord) => {
+      if (!row.createTime) return '-'
+      return new Date(row.createTime).toLocaleString()
+    }
+  },
+])
 
 // 查询项
-const scoreSearchItems = [
-  { key: 'address', label: '用户地址', component: 'ElInput', placeholder: '请输入用户地址' },
+const searchItems = ref([
   { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'source', label: '积分来源', component: 'ElSelect', options: sourceOptions, placeholder: '请选择积分来源', multiple: true, clearable: true },
-]
+  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  {
+    key: 'type',
+    label: '积分来源类型',
+    component: 'ElSelect',
+    options: pointTypeOptions,
+    placeholder: '请选择积分来源类型',
+    clearable: true
+  },
+  { key: 'type2', label: '积分子类型', component: 'ElInput', placeholder: '请输入积分子类型' },
+])
 
-// mock 数据
-const scoreMockList = Array.from({ length: 20 }).map((_, i) => ({
-  email: `user${i + 1}@example.com`,
-  address: `0x${Math.random().toString(16).slice(2, 18)}`,
-  source: sourceOptions[i % 4].value,
-  amount: Math.floor(Math.random() * 1000),
-  createdAt: `2024-06-0${(i % 9) + 1} 10:00:00`,
-}))
-
-// 数据请求（带筛选）
-function scoreRequestData(params: any) {
-  let list = [...scoreMockList]
-  if (params.address) {
-    list = list.filter(item => item.address.includes(params.address))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  if (params.source && params.source.length) {
-    list = list.filter(item => params.source.includes(item.source))
-  }
-  // 分页
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return newApi.carbonList({
+    type: params.type,
+    type2: params.type2,
+    email: params.email,
+    accountAddress: params.accountAddress,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<PointResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取积分记录失败:', error)
+    return {
+      data: {
+        list: [] as PointRecord[],
+        total: 0,
+      }
     }
   })
 }
 </script>
 
 <template>
-  <FaCard title="积分记录" class="mt-4">
+  <FaCard title="积分记录">
     <CrudTable
-      :columns="scoreColumns"
-      :search-items="scoreSearchItems"
-      :request="scoreRequestData"
+      :columns="columns"
+      :search-items="searchItems"
+      :request="requestData"
       :batch-enabled="false"
     />
   </FaCard>

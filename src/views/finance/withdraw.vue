@@ -1,62 +1,118 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
+import type { AxiosResponse } from 'axios'
 import { ElButton, ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from 'vue'
+import newApi from "@/api/modules/new"
 import CrudTable from '@/components/CrudTable/index.vue'
 
-const accounts = ref([
-  { id: 1, name: '主账户', balance: 5000, status: '正常' },
-  { id: 2, name: '备用账户', balance: 2000, status: '冻结' },
+interface WithdrawRecord {
+  email: string
+  accountAddress: string
+  withdrawAddress: string
+  amount: number
+  fee: number
+  state: number
+  hash: string
+  createTime: string
+}
+
+interface WithdrawResponse {
+  records: WithdrawRecord[]
+  total: number
+}
+
+interface RequestParams {
+  email?: string
+  accountAddress?: string
+  state?: number
+  current?: number
+  size?: number
+}
+
+// 提现状态选项
+const stateOptions = [
+  { label: '待审核', value: 0 },
+  { label: '审核通过', value: 1 },
+  { label: '审核拒绝', value: 2 },
+]
+
+// 表格列配置
+const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  { prop: 'withdrawAddress', label: '提现地址', minWidth: 180 },
+  {
+    prop: 'amount',
+    label: '提现金额',
+    minWidth: 120,
+    formatter: (row: WithdrawRecord) => {
+      return row.amount ? row.amount.toFixed(8) : '-'
+    }
+  },
+  {
+    prop: 'fee',
+    label: '手续费',
+    minWidth: 120,
+    formatter: (row: WithdrawRecord) => {
+      return row.fee ? row.fee.toFixed(8) : '-'
+    }
+  },
+  {
+    prop: 'state',
+    label: '状态',
+    minWidth: 100,
+    formatter: (row: WithdrawRecord) => {
+      const state = stateOptions.find(item => item.value === row.state)
+      return state ? state.label : '-'
+    }
+  },
+  { prop: 'hash', label: '交易哈希', minWidth: 220 },
+  {
+    prop: 'createTime',
+    label: '提现时间',
+    minWidth: 160,
+    formatter: (row: WithdrawRecord) => {
+      if (!row.createTime) return '-'
+      return new Date(row.createTime).toLocaleString()
+    }
+  },
 ])
 
-// 提现记录表格列
-const withdrawColumns = [
-  { prop: 'email', label: '邮箱', minWidth: 140 },
-  { prop: 'walletAddress', label: '用户钱包地址', minWidth: 140 },
-  { prop: 'withdrawAddress', label: '提现地址', minWidth: 140 },
-  { prop: 'usdt', label: 'USDT数量', minWidth: 100 },
-  { prop: 'status', label: '状态', minWidth: 100 },
-  { prop: 'hash', label: '哈希', minWidth: 180 },
-  { prop: 'createdAt', label: '时间', minWidth: 140 },
-  { prop: 'fee', label: '手续费', minWidth: 100 },
-  { prop: 'action', label: '操作', minWidth: 120, slot: 'action' },
-]
-
 // 查询项
-const withdrawSearchItems = [
-  { key: 'walletAddress', label: '用户钱包地址', component: 'ElInput', placeholder: '请输入用户钱包地址' },
-  { key: 'email', label: '邮箱', component: 'ElInput', placeholder: '请输入邮箱' },
-]
+const searchItems = ref([
+  { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
+  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  {
+    key: 'state',
+    label: '提现状态',
+    component: 'ElSelect',
+    placeholder: '请选择提现状态',
+    options: stateOptions,
+    clearable: true
+  },
+])
 
-// mock 数据
-const withdrawMockList = ref(Array.from({ length: 10 }).map((_, i) => ({
-  id: i + 1,
-  email: `user${i + 1}@example.com`,
-  walletAddress: `0x${Math.random().toString(16).slice(2, 18)}`,
-  withdrawAddress: `提现地址${i + 1}`,
-  usdt: Math.floor(Math.random() * 1000),
-  status: i % 2 === 0 ? '待审核' : '已完成',
-  hash: `0x${Math.random().toString(16).slice(2, 18)}`,
-  createdAt: `2024-06-0${(i % 9) + 1} 10:00:00`,
-  fee: Math.floor(Math.random() * 10),
-})))
-
-// 数据请求（带筛选）
-function withdrawRequestData(params: any) {
-  let list = [...withdrawMockList.value]
-  if (params.walletAddress) {
-    list = list.filter(item => item.walletAddress.includes(params.walletAddress))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  // 分页
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return newApi.withdrawList({
+    email: params.email,
+    accountAddress: params.accountAddress,
+    state: params.state,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<WithdrawResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取提现记录失败:', error)
+    return {
+      data: {
+        list: [] as WithdrawRecord[],
+        total: 0,
+      }
     }
   })
 }
@@ -80,16 +136,16 @@ function handleAudit(row: any) {
 </script>
 
 <template>
-  <FaCard title="提现记录" class="mt-4">
+  <FaCard title="提现记录">
     <CrudTable
-      :columns="withdrawColumns"
-      :search-items="withdrawSearchItems"
-      :request="withdrawRequestData"
+      :columns="columns"
+      :search-items="searchItems"
+      :request="requestData"
       :batch-enabled="false"
     >
       <template #operation-buttons="{ row }">
         <ElButton
-          v-if="row.status === '待审核'"
+          v-if="row.state === 0"
           type="primary"
           size="small"
           @click="handleAudit(row)"

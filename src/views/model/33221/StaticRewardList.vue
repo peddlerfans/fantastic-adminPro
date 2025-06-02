@@ -1,45 +1,100 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
+import type { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import modelApi from "@/api/modules/model"
 import CrudTable from '@/components/CrudTable/index.vue'
 
-const columns = [
-  { prop: 'email', label: '用户邮箱', minWidth: 140 },
-  { prop: 'address', label: '用户地址', minWidth: 140 },
-  { prop: 'score', label: '获得积分', minWidth: 100 },
-  { prop: 'createdAt', label: '获得时间', minWidth: 140 },
-]
+interface StaticRewardRecord {
+  userEmail: string
+  accountAddress: string
+  motivatePoint: number
+  motivateDays: number
+  getPoint: number
+  getTimes: number
+  createTime: string
+}
 
-const searchItems = [
-  { key: 'address', label: '用户地址', component: 'ElInput', placeholder: '请输入用户地址' },
+interface StaticRewardResponse {
+  records: StaticRewardRecord[]
+  total: number
+}
+
+interface RequestParams {
+  email?: string
+  address?: string
+  current?: number
+  size?: number
+}
+
+// 表格列配置
+const columns = ref([
+  { prop: 'userEmail', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  {
+    prop: 'motivatePoint',
+    label: '总激励积分',
+    minWidth: 120,
+    formatter: (row: StaticRewardRecord) => {
+      return row.motivatePoint ? row.motivatePoint.toFixed(8) : '-'
+    }
+  },
+  { prop: 'motivateDays', label: '激励天数', minWidth: 100 },
+  {
+    prop: 'getPoint',
+    label: '已获得积分',
+    minWidth: 120,
+    formatter: (row: StaticRewardRecord) => {
+      return row.getPoint ? row.getPoint.toFixed(8) : '-'
+    }
+  },
+  { prop: 'getTimes', label: '已释放次数', minWidth: 100 },
+  {
+    prop: 'createTime',
+    label: '激励开始时间',
+    minWidth: 160,
+    formatter: (row: StaticRewardRecord) => {
+      if (!row.createTime) return '-'
+      return new Date(row.createTime).toLocaleString()
+    }
+  },
+])
+
+// 查询项
+const searchItems = ref([
   { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-]
+  { key: 'address', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+])
 
-const mockList = Array.from({ length: 20 }).map((_, i) => ({
-  email: `user${i + 1}@example.com`,
-  address: `0x${Math.random().toString(16).slice(2, 18)}`,
-  score: Math.floor(Math.random() * 1000),
-  createdAt: `2024-06-0${(i % 9) + 1} 10:00:00`,
-}))
-
-function requestData(params: any) {
-  let list = [...mockList]
-  if (params.address) {
-    list = list.filter(item => item.address.includes(params.address))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return modelApi.getStaticRewardList({
+    email: params.email,
+    address: params.address,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<StaticRewardResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取静态奖励列表失败:', error)
+    return {
+      data: {
+        list: [] as StaticRewardRecord[],
+        total: 0,
+      }
     }
   })
 }
 </script>
 
 <template>
-  <CrudTable :columns="columns" :search-items="searchItems" :request="requestData" :batch-enabled="false" />
+  <CrudTable
+    :columns="columns"
+    :search-items="searchItems"
+    :request="requestData"
+    :batch-enabled="false"
+  />
 </template>

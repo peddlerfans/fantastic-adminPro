@@ -24,22 +24,24 @@ export default {
   }),
 
   // 用户报表查询
-  userStatistics: (data: { startDate: string, endDate: string }) => api.post('statistics/user/query', data),
+  userStatistics: (data: { startDate: string, endDate: string }) => api.post('/api/statistics/user/query', data),
 
   // 设备报表查询
-  deviceStatistics: (data: { startDate: string, endDate: string }) => api.post('statistics/device2/query', data),
+  deviceStatistics: (data: { startDate: string, endDate: string }) => api.post('/api/statistics/device2/query', data),
 
   // 充值报表查询
-  rechargeStatistics: (data: { startDate: string, endDate: string }) => api.post('statistics/tokenRecharge/query', data),
+  rechargeStatistics: (data: { startDate: string, endDate: string }) => api.post('/api/statistics/tokenRecharge/query', data),
 
   // 提现报表查询
-  withdrawStatistics: (data: { startDate: string, endDate: string }) => api.post('statistics/tokenWithdraw/query', data),
+  withdrawStatistics: (data: { startDate: string, endDate: string }) => api.post('/api/statistics/tokenWithdraw/query', data),
 
   // 智算报表查询
-  aiStatistics: (data: { startDate: string, endDate: string }) => api.post('statistics/computingAiUserDevice/query', data),
+  aiStatistics: (data: { startDate: string, endDate: string }) => api.post('/api/statistics/computingAiUserDevice/query', data),
 
   // 奖励报表查询
-  rewardStatistics: (data: { startDate: string, endDate: string }) => api.post('statistics/reward/query', data),
+  rewardStatistics: (data: { startDate: string, endDate: string }) => api.post('/api/statistics/reward/query', data),
 
+  // 划转报表查询
+  transferStatistics: (data: any) => api.post('/api/transactionFlow/transfer/list', data),
 
 }

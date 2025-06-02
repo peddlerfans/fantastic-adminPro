@@ -1,70 +1,119 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
+import type { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import newApi from "@/api/modules/new"
 import CrudTable from '@/components/CrudTable/index.vue'
 
+interface StepRecord {
+  email: string
+  accountAddress: string
+  virtual: number
+  amount: number
+  date: string
+}
+
+interface StepResponse {
+  records: StepRecord[]
+  total: number
+}
+
+interface RequestParams {
+  type?: string
+  type2?: string
+  email?: string
+  accountAddress?: string
+  date?: string
+  current?: number
+  size?: number
+}
+
 // 步数来源选项
-const stepSourceOptions = [
-  { label: '智能鞋', value: '智能鞋' },
-  { label: '智能戒指', value: '智能戒指' },
-  { label: '智能芯片', value: '智能芯片' },
-  { label: '零撸设备', value: '零撸设备' },
+const virtualOptions = [
+  { label: '实体设备', value: 1 },
+  { label: '虚拟设备', value: 2 },
 ]
 
-// 步数记录表格列
-const stepColumns = [
-  { prop: 'email', label: '用户邮箱', minWidth: 140 },
-  { prop: 'address', label: '用户地址', minWidth: 140 },
-  { prop: 'source', label: '步数来源', minWidth: 120 },
-  { prop: 'step', label: '步数', minWidth: 100 },
-  { prop: 'createdAt', label: '时间', minWidth: 140 },
-]
+// 表格列配置
+const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  {
+    prop: 'virtual',
+    label: '步数来源',
+    minWidth: 120,
+    formatter: (row: StepRecord) => {
+      if (row.virtual === 1) return '实体设备'
+      if (row.virtual === 2) return '虚拟设备'
+      return '-'
+    }
+  },
+  {
+    prop: 'amount',
+    label: '步数',
+    minWidth: 120,
+    formatter: (row: StepRecord) => {
+      return row.amount ? row.amount.toLocaleString() : '-'
+    }
+  },
+  { prop: 'date', label: '记录日期', minWidth: 120 },
+])
 
 // 查询项
-const stepSearchItems = [
-  { key: 'address', label: '用户地址', component: 'ElInput', placeholder: '请输入用户地址' },
+const searchItems = ref([
   { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'source', label: '步数来源', component: 'ElSelect', options: stepSourceOptions, placeholder: '请选择步数来源', multiple: true, clearable: true },
-]
+  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  {
+    key: 'virtual',
+    label: '步数来源',
+    component: 'ElSelect',
+    placeholder: '请选择步数来源',
+    options: virtualOptions,
+    clearable: true
+  },
+  {
+    key: 'date',
+    label: '记录日期',
+    component: 'ElDatePicker',
+    placeholder: '请选择日期',
+    type: 'date',
+    valueFormat: 'YYYY-MM-DD'
+  },
+])
 
-// mock 数据
-const stepMockList = Array.from({ length: 20 }).map((_, i) => ({
-  email: `user${i + 1}@example.com`,
-  address: `0x${Math.random().toString(16).slice(2, 18)}`,
-  source: stepSourceOptions[i % 4].value,
-  step: Math.floor(Math.random() * 20000),
-  createdAt: `2024-06-0${(i % 9) + 1} 10:00:00`,
-}))
-
-// 数据请求（带筛选）
-function stepRequestData(params: any) {
-  let list = [...stepMockList]
-  if (params.address) {
-    list = list.filter(item => item.address.includes(params.address))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  if (params.source && params.source.length) {
-    list = list.filter(item => params.source.includes(item.source))
-  }
-  // 分页
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return newApi.stepList({
+    type: params.type,
+    type2: params.type2,
+    email: params.email,
+    accountAddress: params.accountAddress,
+    date: params.date,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<StepResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取步数记录失败:', error)
+    return {
+      data: {
+        list: [] as StepRecord[],
+        total: 0,
+      }
     }
   })
 }
 </script>
 
 <template>
-  <FaCard title="步数记录" class="mt-4">
+  <FaCard title="步数记录">
     <CrudTable
-      :columns="stepColumns"
-      :search-items="stepSearchItems"
-      :request="stepRequestData"
+      :columns="columns"
+      :search-items="searchItems"
+      :request="requestData"
       :batch-enabled="false"
     />
   </FaCard>

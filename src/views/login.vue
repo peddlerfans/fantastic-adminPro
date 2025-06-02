@@ -34,7 +34,7 @@ const themeList = computed(() => {
 
 const layoutAlign = ref<'left' | 'center' | 'right'>('center')
 const redirect = ref(route.query.redirect?.toString() ?? settingsStore.settings.home.fullPath)
-const account = ref<string>()
+const mobile = ref<string>()
 // 表单类型
 const formType = ref<'login' | 'register' | 'resetPassword'>('login')
 </script>
@@ -85,21 +85,21 @@ const formType = ref<'login' | 'register' | 'resetPassword'>('login')
       <Transition name="fade" mode="out-in">
         <LoginForm
           v-if="formType === 'login'"
-          :account
+          :mobile
           @on-login="router.push(redirect)"
-          @on-register="(val) => { formType = 'register'; account = val }"
-          @on-reset-password="(val) => { formType = 'resetPassword'; account = val }"
+          @on-register="(val) => { formType = 'register'; mobile = val }"
+          @on-reset-password="(val) => { formType = 'resetPassword'; mobile = val }"
         />
         <RegisterForm
           v-else-if="formType === 'register'"
-          :account
-          @on-register="(val) => { formType = 'login'; account = val }"
+          :mobile
+          @on-register="(val) => { formType = 'login'; mobile = val }"
           @on-login="formType = 'login'"
         />
         <ResetPasswordForm
           v-else-if="formType === 'resetPassword'"
-          :account
-          @on-reset-password="(val) => { formType = 'login'; account = val }"
+          :mobile
+          @on-reset-password="(val) => { formType = 'login'; mobile = val }"
           @on-login="formType = 'login'"
         />
       </Transition>

@@ -30,7 +30,7 @@ const globalSettingsDefault: RecursiveRequired<Settings.all> = {
   home: {
     enable: true,
     title: 'app.route.home',
-    fullPath: '/',
+    fullPath: '/dashboard/user',
   },
   layout: {
     widthMode: 'adaption',

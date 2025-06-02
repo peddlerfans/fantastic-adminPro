@@ -1,11 +1,11 @@
 import type { Settings } from '#/global'
+import { cloneDeep } from 'es-toolkit'
 import apiUser from '@/api/modules/user'
 import router from '@/router'
 import settingsDefault from '@/settings'
 import eventBus from '@/utils/eventBus'
 import { diffTwoObj, mergeWithoutUndefinedProps } from '@/utils/object'
 import storage from '@/utils/storage'
-import { cloneDeep } from 'es-toolkit'
 import useMenuStore from './menu'
 import useRouteStore from './route'
 import useSettingsStore from './settings'
@@ -20,7 +20,7 @@ const useUserStore = defineStore(
     const routeStore = useRouteStore()
     const menuStore = useMenuStore()
 
-    const account = ref(storage.local.get('account') ?? '')
+    const mobile = ref(storage.local.get('mobile') ?? '')
     const token = ref(storage.local.get('token') ?? '')
     const avatar = ref(storage.local.get('avatar') ?? '')
     const permissions = ref<string[]>([])
@@ -33,16 +33,20 @@ const useUserStore = defineStore(
 
     // 登录
     async function login(data: {
-      account: string
+      mobile: string
       password: string
     }) {
       const res = await apiUser.login(data)
-      storage.local.set('account', res.data.account)
-      storage.local.set('token', res.data.token)
-      storage.local.set('avatar', res.data.avatar)
-      account.value = res.data.account
-      token.value = res.data.token
-      avatar.value = res.data.avatar
+      // 保存 token
+      storage.local.set('token', res.data)
+      token.value = res.data
+      // 保存用户名
+      storage.local.set('mobile', data.mobile)
+      mobile.value = data.mobile
+      // 设置默认头像
+      const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${data.mobile}`
+      storage.local.set('avatar', defaultAvatar)
+      avatar.value = defaultAvatar
     }
 
     // 手动登出
@@ -84,7 +88,7 @@ const useUserStore = defineStore(
     function logoutCleanStatus() {
       storage.local.remove('account')
       storage.local.remove('avatar')
-      account.value = ''
+      mobile.value = ''
       avatar.value = ''
       permissions.value = []
       settingsStore.updateSettings({}, true)
@@ -197,7 +201,7 @@ const useUserStore = defineStore(
       let data: Settings.all = {}
       if (settingsStore.settings.userPreferences.storageTo === 'local') {
         if (storage.local.has('userPreferences')) {
-          data = JSON.parse(storage.local.get('userPreferences') as string)[account.value] || {}
+          data = JSON.parse(storage.local.get('userPreferences') as string)[mobile.value] || {}
         }
       }
       else if (settingsStore.settings.userPreferences.storageTo === 'server') {
@@ -218,7 +222,7 @@ const useUserStore = defineStore(
       data = diffTwoObj(settingsDefault, data)
       if (settingsStore.settings.userPreferences.storageTo === 'local') {
         const userPreferencesData = storage.local.has('userPreferences') ? JSON.parse(storage.local.get('userPreferences') as string) : {}
-        userPreferencesData[account.value] = data
+        userPreferencesData[mobile.value] = data
         storage.local.set('userPreferences', JSON.stringify(userPreferencesData))
       }
       else if (settingsStore.settings.userPreferences.storageTo === 'server') {
@@ -227,7 +231,7 @@ const useUserStore = defineStore(
     }
 
     return {
-      account,
+      mobile,
       token,
       avatar,
       permissions,

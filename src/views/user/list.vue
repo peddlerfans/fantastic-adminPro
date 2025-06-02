@@ -7,89 +7,71 @@ meta:
 import { ElButton, ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from 'vue'
 import FormMode from '@/components/CrudTable/components/FormMode/index.vue'
-
+// eslint-disable-next-line perfectionist/sort-imports
+import userApi from "@/api/modules/user"
 import CrudTable from '@/components/CrudTable/index.vue'
 
 // 获取 CrudTable 实例，用于调用其暴露的方法
 const crudTableRef = ref<InstanceType<typeof CrudTable> | null>(null)
 
-// 定义表格列
+interface UserInfo {
+  email: string
+  accountAddress: string
+  status: number
+  createTime: string
+}
+
+interface RequestParams {
+  email?: string
+  accountAddress?: string
+  page?: number
+  size?: number
+}
+
+// 表格列配置
 const columns = ref([
-  {
-    prop: 'id',
-    label: '用户ID',
-    width: 80,
-  },
-  {
-    prop: 'username',
-    label: '用户名',
-  },
-  {
-    prop: 'email',
-    label: '邮箱',
-  },
-  {
-    prop: 'address',
-    label: '地址',
-  },
+  { prop: 'email', label: '用户邮箱', minWidth: 140 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
   {
     prop: 'status',
     label: '状态',
-    width: 80,
-    formatter: (row: any) => (row.status === 1 ? '正常' : '冻结'),
+    minWidth: 100,
+    formatter: (row: UserInfo) => row.status === 1 ? '正常' : '已删除'
+  },
+  {
+    prop: 'createTime',
+    label: '注册时间',
+    minWidth: 160,
+    formatter: (row: UserInfo) => new Date(row.createTime).toLocaleString()
   },
 ])
 
-// 定义搜索项
+// 查询项
 const searchItems = ref([
-  {
-    key: 'address',
-    label: '地址',
-    component: 'ElInput',
-    placeholder: '请输入地址',
-  },
-  {
-    key: 'email',
-    label: '邮箱',
-    component: 'ElInput',
-    placeholder: '请输入邮箱',
-  },
+  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  { key: 'email', label: '邮箱', component: 'ElInput', placeholder: '请输入邮箱' },
 ])
 
-// 模拟数据请求
-function requestData(params: any) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const mockList = Array.from({ length: 20 }).map((_, index) => ({
-        id: index + 1,
-        username: `用户${index + 1}`,
-        email: `user${index + 1}@example.com`,
-        address: `地址${index + 1}`,
-        status: index % 2 === 0 ? 1 : 0, // 1: 正常, 0: 冻结
-      }))
-
-      // 模拟筛选
-      let filteredList = mockList
-      if (params.address) {
-        filteredList = filteredList.filter(item => item.address.includes(params.address))
+// 数据请求
+function requestData(params: RequestParams) {
+  return userApi.getUserList({
+    email: params.email,
+    accountAddress: params.accountAddress,
+    current: params.page || 1,
+    size: params.size || 10
+  }).then(res => ({
+    data: {
+      list: res.data.records as UserInfo[],
+      total: res.data.total
+    }
+  })).catch(error => {
+    console.error('获取用户列表失败:', error)
+    return {
+      data: {
+        list: [] as UserInfo[],
+        total: 0
       }
-      if (params.email) {
-        filteredList = filteredList.filter(item => item.email.includes(params.email))
-      }
-
-      // 模拟分页
-      const { page, size } = params
-      const startIndex = (page - 1) * size
-      const endIndex = startIndex + size
-      const paginatedList = filteredList.slice(startIndex, endIndex)
-
-      resolve({
-        data: {
-          list: paginatedList,
-          total: filteredList.length,
-        },
-      })
-    }, 500)
+    }
   })
 }
 
@@ -166,7 +148,7 @@ function handleFormSuccess() {
 
       <!-- 如果需要自定义列的内容，可以使用具名 slot，slot名为 col-加上列的 prop -->
       <template #col-status="{ row }">
-        <ElTag :type="row.status === 1 ? 'success' : 'danger'">{{ row.status === 1 ? '正常' : '冻结' }}</ElTag>
+        <ElTag :type="row.status === 1 ? 'success' : 'danger'">{{ row.status === 1 ? '正常' : '软删除' }}</ElTag>
       </template>
 
     </CrudTable>

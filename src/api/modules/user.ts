@@ -3,9 +3,11 @@ import api from '../index'
 export default {
   // 登录
   login: (data: {
-    account: string
+    mobile: string
     password: string
-  }) => api.post('user/login', data, { baseURL: '/mock/' }),
+  }) => api.post('/auth/login', data
+    // { baseURL: '/mock/' }
+  ),
 
   // 获取权限
   permission: () => api.get('user/permission'),
@@ -39,10 +41,21 @@ export default {
   favoritesEdit: (favorites: string) => api.post('user/favorites/edit', {
     favorites,
   }),
-
-  // 用户收货地址列表
-  getUserAddressList: (data: any) => api.post('user/getUserAddressList', data),
-
   // 用户资产列表
   getUserAssetList: (data: any) => api.post('user/getUserAssetList', data),
+
+  // 用户列表
+  getUserList: (data: any) => api.post('/api/user/getUserList', data),
+
+  // 用户资产列表查询
+  getUserAssetListQuery: (data: any) => api.post('/api/user/getUserAssetList', data),
+
+  // 用户网体列表查询
+  getShareRelationList: (data: any) => api.post('/api/user/getShareRelationList', data),
+
+  // 用户地址查询
+  getUserAddressListQuery: (data: any) => api.post('/api/user/getUserAddressList', data),
+
+  // 用户ip地址查询
+  getUserIpListQuery: (data: any) => api.post('/api/user/getUserIpList', data),
 }

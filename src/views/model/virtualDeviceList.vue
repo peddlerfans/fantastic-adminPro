@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import modelApi from "@/api/modules/model"
 import CrudTable from '@/components/CrudTable/index.vue'
 
-interface DeviceRecord {
+interface VirtualDeviceRecord {
   deviceName: string
   deviceNo: string
   deviceStatus: number
@@ -17,8 +17,8 @@ interface DeviceRecord {
   email: string
 }
 
-interface DeviceResponse {
-  records: DeviceRecord[]
+interface VirtualDeviceResponse {
+  records: VirtualDeviceRecord[]
   total: number
 }
 
@@ -45,7 +45,7 @@ const columns = ref([
     prop: 'deviceStatus',
     label: '设备状态',
     minWidth: 100,
-    formatter: (row: DeviceRecord) => {
+    formatter: (row: VirtualDeviceRecord) => {
       const option = statusOptions.find(opt => opt.value === row.deviceStatus)
       return option ? option.label : '-'
     }
@@ -54,7 +54,7 @@ const columns = ref([
     prop: 'isAuthorized',
     label: '确权状态',
     minWidth: 100,
-    formatter: (row: DeviceRecord) => {
+    formatter: (row: VirtualDeviceRecord) => {
       return row.isAuthorized === 1 ? '已确权' : '未确权'
     }
   },
@@ -62,7 +62,7 @@ const columns = ref([
     prop: 'point',
     label: '积分',
     minWidth: 120,
-    formatter: (row: DeviceRecord) => {
+    formatter: (row: VirtualDeviceRecord) => {
       return row.point ? row.point.toFixed(8) : '-'
     }
   },
@@ -70,7 +70,7 @@ const columns = ref([
     prop: 'isPledged',
     label: '质押状态',
     minWidth: 100,
-    formatter: (row: DeviceRecord) => {
+    formatter: (row: VirtualDeviceRecord) => {
       return row.isPledged === 1 ? '已质押' : '未质押'
     }
   },
@@ -80,7 +80,7 @@ const columns = ref([
     prop: 'expireStart',
     label: '激活时间',
     minWidth: 160,
-    formatter: (row: DeviceRecord) => {
+    formatter: (row: VirtualDeviceRecord) => {
       if (!row.expireStart) return '-'
       return new Date(row.expireStart).toLocaleString()
     }
@@ -104,23 +104,23 @@ const searchItems = ref([
 
 // 数据请求
 function requestData(params: RequestParams) {
-  return modelApi.getDeviceList({
+  return modelApi.getVirtualDeviceList({
     email: params.email,
     accountAddress: params.accountAddress,
     status: params.status,
     deviceName: params.deviceName,
     current: params.current || 1,
     size: params.size || 10,
-  }).then((res: AxiosResponse<DeviceResponse>) => ({
+  }).then((res: AxiosResponse<VirtualDeviceResponse>) => ({
     data: {
       list: res.data.records,
       total: res.data.total,
     }
   })).catch((error: unknown) => {
-    console.error('获取实体设备列表失败:', error)
+    console.error('获取虚拟设备列表失败:', error)
     return {
       data: {
-        list: [] as DeviceRecord[],
+        list: [] as VirtualDeviceRecord[],
         total: 0,
       }
     }
@@ -129,7 +129,7 @@ function requestData(params: RequestParams) {
 </script>
 
 <template>
-  <FaCard title="实体设备列表">
+  <FaCard title="虚拟设备列表">
     <CrudTable
       :columns="columns"
       :search-items="searchItems"

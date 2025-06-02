@@ -1,72 +1,106 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
+import type { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import modelApi from "@/api/modules/model"
 import CrudTable from '@/components/CrudTable/index.vue'
 
-// 保险状态选项
-const statusOptions = [
-  { label: '未选择', value: '未选择' },
-  { label: '选择U', value: '选择U' },
-  { label: '选择币', value: '选择币' },
-  { label: '自动选择', value: '自动选择' },
+interface InsuranceRecord {
+  accountAddress: string
+  email: string
+  deviceNo: string
+  releasedUsdt: number
+  releasedPoint: number
+  isBuyInsurance: number
+}
+
+interface InsuranceResponse {
+  records: InsuranceRecord[]
+  total: number
+}
+
+interface RequestParams {
+  email?: string
+  accountAddress?: string
+  current?: number
+  size?: number
+}
+
+// 保险类型选项
+const insuranceOptions = [
+  { label: '未选择', value: 0 },
+  { label: '选择U', value: 1 },
+  { label: '选择币', value: 2 },
 ]
 
-// 保险表格列
-const insuranceColumns = [
-  { prop: 'address', label: '用户地址', minWidth: 140 },
-  { prop: 'email', label: '用户邮箱', minWidth: 140 },
-  { prop: 'releasedToken', label: '已释放币', minWidth: 100 },
-  { prop: 'releasedScore', label: '已释放积分', minWidth: 100 },
-  { prop: 'status', label: '状态', minWidth: 100 },
-  { prop: 'buyTime', label: '购买时间', minWidth: 140 },
-]
+// 表格列配置
+const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  { prop: 'deviceNo', label: '设备编号', minWidth: 180 },
+  {
+    prop: 'releasedUsdt',
+    label: '已释放USDT',
+    minWidth: 120,
+    formatter: (row: InsuranceRecord) => {
+      return row.releasedUsdt ? row.releasedUsdt.toFixed(8) : '-'
+    }
+  },
+  {
+    prop: 'releasedPoint',
+    label: '已释放积分',
+    minWidth: 120,
+    formatter: (row: InsuranceRecord) => {
+      return row.releasedPoint ? row.releasedPoint.toFixed(8) : '-'
+    }
+  },
+  {
+    prop: 'isBuyInsurance',
+    label: '保险类型',
+    minWidth: 120,
+    formatter: (row: InsuranceRecord) => {
+      const option = insuranceOptions.find(opt => opt.value === row.isBuyInsurance)
+      return option ? option.label : '-'
+    }
+  },
+])
 
 // 查询项
-const insuranceSearchItems = [
-  { key: 'address', label: '用户地址', component: 'ElInput', placeholder: '请输入用户地址' },
+const searchItems = ref([
   { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'status', label: '状态', component: 'ElSelect', options: statusOptions, placeholder: '请选择状态', clearable: true },
-]
+  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+])
 
-// mock 数据
-const insuranceMockList = Array.from({ length: 20 }).map((_, i) => ({
-  address: `0x${Math.random().toString(16).slice(2, 18)}`,
-  email: `user${i + 1}@example.com`,
-  releasedToken: Math.floor(Math.random() * 1000),
-  releasedScore: Math.floor(Math.random() * 500),
-  status: statusOptions[i % 4].value,
-  buyTime: `2024-06-0${(i % 9) + 1} 09:00:00`,
-}))
-
-// 数据请求（带筛选）
-function insuranceRequestData(params: any) {
-  let list = [...insuranceMockList]
-  if (params.address) {
-    list = list.filter(item => item.address.includes(params.address))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  if (params.status) {
-    list = list.filter(item => item.status === params.status)
-  }
-  // 分页
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return modelApi.getInsuranceList({
+    email: params.email,
+    accountAddress: params.accountAddress,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<InsuranceResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取保险记录列表失败:', error)
+    return {
+      data: {
+        list: [] as InsuranceRecord[],
+        total: 0,
+      }
     }
   })
 }
 </script>
 
 <template>
-  <FaCard title="保险列表" class="mt-4">
+  <FaCard title="保险记录列表">
     <CrudTable
-      :columns="insuranceColumns"
-      :search-items="insuranceSearchItems"
-      :request="insuranceRequestData"
+      :columns="columns"
+      :search-items="searchItems"
+      :request="requestData"
       :batch-enabled="false"
     />
   </FaCard>

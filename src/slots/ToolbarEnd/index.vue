@@ -23,6 +23,7 @@ en:
 import useSettingsStore from '@/store/modules/settings'
 import useUserStore from '@/store/modules/user'
 import eventBus from '@/utils/eventBus'
+// eslint-disable-next-line perfectionist/sort-imports
 import { useI18n } from 'vue-i18n'
 import Profile from './profile.vue'
 
@@ -59,13 +60,13 @@ const isProfileShow = ref(false)
           {{ t('current_account') }}
         </div>
         <div class="flex-center-start gap-2">
-          <FaAvatar :src="userStore.avatar" :fallback="userStore.account.slice(0, 5)" shape="square" />
+          <FaAvatar :src="userStore.avatar" :fallback="userStore.mobile?.slice(0, 5)" shape="square" />
           <div class="space-y-1">
             <div class="text-base lh-none">
-              {{ userStore.account }}
+              {{ userStore.mobile || '未登录' }}
             </div>
             <div class="text-xs text-secondary-foreground/50 font-normal">
-              这里可以显示邮箱
+              {{ userStore.mobile }}
             </div>
           </div>
         </div>
@@ -76,7 +77,7 @@ const isProfileShow = ref(false)
         <FaIcon name="i-carbon:user-avatar-filled-alt" class="size-6 text-secondary-foreground/50" />
       </FaAvatar>
       <template v-if="settingsStore.mode === 'pc'">
-        {{ userStore.account }}
+        {{ userStore.mobile }}
         <FaIcon name="i-ep:caret-bottom" />
       </template>
     </FaButton>

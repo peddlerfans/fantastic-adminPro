@@ -24,8 +24,20 @@ export default {
   }),
 
   // 充值记录分页查询
-  rechargeList: (data: any) => api.post('transactionFlow/recharge/list', data),
+  rechargeList: (data: any) => api.post('/api/transactionFlow/recharge/list', data),
 
   // USDT划转记录分页查询
   usdtTransferList: (data: any) => api.post('transactionFlow/transfer/usdt/list', data),
+
+  // 提现记录分页查询
+  withdrawList: (data: any) => api.post('/api/transactionFlow/withdraw/list ', data),
+
+  // 步数记录
+  stepList: (data: any) => api.post('/api/transactionFlow/step/list', data),
+
+  // 代币记录查询
+  tokenList: (data: any) => api.post('/api/transactionFlow/token/list', data),
+
+  // 积分记录查询
+  carbonList: (data: any) => api.post('/api/transactionFlow/point/list', data),
 }

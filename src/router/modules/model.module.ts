@@ -43,6 +43,15 @@ const routes: RouteRecordRaw = {
       },
     },
     {
+      path: 'virtualDeviceList',
+      name: 'VirtualDeviceList',
+      component: () => import('@/views/model/virtualDeviceList.vue'),
+      meta: {
+        title: '虚拟设备列表',
+        hidden: true,
+      },
+    },
+    {
       path: 'insuranceList',
       name: 'modelInsuranceList',
       component: () => import('@/views/model/insuranceList.vue'),

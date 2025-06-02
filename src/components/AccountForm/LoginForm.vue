@@ -11,12 +11,12 @@
     "wechatQrcode": "请使用微信扫码登录",
     "testLogin": "演示账号一键登录",
     "form": {
-      "account": "用户名",
+      "mobile": "用户名",
       "password": "密码",
       "login": "登录"
     },
     "rules": {
-      "account": "请输入用户名",
+      "mobile": "请输入用户名",
       "password": "请输入密码"
     }
   },
@@ -31,12 +31,12 @@
     "wechatQrcode": "請使用微信掃碼登入",
     "testLogin": "演示帳號一键登入",
     "form": {
-      "account": "用戶名",
+      "mobile": "用戶名",
       "password": "密碼",
       "login": "登入"
     },
     "rules": {
-      "account": "請輸入用戶名",
+      "mobile": "請輸入用戶名",
       "password": "請輸入密碼"
     }
   },
@@ -51,12 +51,12 @@
     "wechatQrcode": "Please use WeChat scan login",
     "testLogin": "Demo Account One-click Login",
     "form": {
-      "account": "Account",
+      "mobile": "Account",
       "password": "Password",
       "login": "Login"
     },
     "rules": {
-      "account": "Please enter the account",
+      "mobile": "Please enter the account",
       "password": "Please enter the password"
     }
   }
@@ -71,23 +71,27 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
 import * as z from 'zod'
+import { useRouter } from 'vue-router'
+import useSettingsStore from '@/store/modules/settings'
 
 defineOptions({
   name: 'LoginForm',
 })
 
 const props = defineProps<{
-  account?: string
+  mobile?: string
 }>()
 
 const emits = defineEmits<{
-  onLogin: [account?: string]
-  onRegister: [account?: string]
-  onResetPassword: [account?: string]
+  onLogin: [mobile?: string]
+  onRegister: [mobile?: string]
+  onResetPassword: [mobile?: string]
 }>()
 
 const { t } = useI18n()
 const userStore = useUserStore()
+const router = useRouter()
+const settingsStore = useSettingsStore()
 
 const title = import.meta.env.VITE_APP_TITLE
 const loading = ref(false)
@@ -97,12 +101,12 @@ const type = ref<'default' | 'qrcode'>('default')
 
 const form = useForm({
   validationSchema: toTypedSchema(z.object({
-    account: z.string().min(1, t('rules.account')),
+    mobile: z.string().min(1, t('rules.mobile')),
     password: z.string().min(1, t('rules.password')),
     remember: z.boolean(),
   })),
   initialValues: {
-    account: props.account ?? storage.local.get('login_account') ?? '',
+    mobile: props.mobile ?? storage.local.get('login_account') ?? '',
     password: '',
     remember: storage.local.has('login_account'),
   },
@@ -111,19 +115,20 @@ const onSubmit = form.handleSubmit((values) => {
   loading.value = true
   userStore.login(values).then(() => {
     if (values.remember) {
-      storage.local.set('login_account', values.account)
+      storage.local.set('login_account', values.mobile)
     }
     else {
       storage.local.remove('login_account')
     }
-    emits('onLogin', values.account)
+    router.push(settingsStore.settings.home.fullPath)
+    emits('onLogin', values.mobile)
   }).finally(() => {
     loading.value = false
   })
 })
 
-function testAccount(account: string) {
-  form.setFieldValue('account', account)
+function testAccount(mobile: string) {
+  form.setFieldValue('mobile', mobile)
   form.setFieldValue('password', '123456')
   onSubmit()
 }
@@ -149,10 +154,10 @@ function testAccount(account: string) {
     </div>
     <div v-show="type === 'default'">
       <form @submit="onSubmit">
-        <FormField v-slot="{ componentField, errors }" name="account">
+        <FormField v-slot="{ componentField, errors }" name="mobile">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
-              <FaInput type="text" :placeholder="t('form.account')" class="w-full" :class="errors.length && 'border-destructive'" v-bind="componentField" />
+              <FaInput type="text" :placeholder="t('form.mobile')" class="w-full" :class="errors.length && 'border-destructive'" v-bind="componentField" />
             </FormControl>
             <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0" leave-active-class="transition-opacity" leave-to-class="opacity-0">
               <FormMessage class="absolute bottom-1 text-xs" />
@@ -181,7 +186,7 @@ function testAccount(account: string) {
               </FormItem>
             </FormField>
           </div>
-          <FaButton variant="link" class="h-auto p-0" type="button" @click="emits('onResetPassword', form.values.account)">
+          <FaButton variant="link" class="h-auto p-0" type="button" @click="emits('onResetPassword', form.values.mobile)">
             {{ t('forget') }}
           </FaButton>
         </div>
@@ -190,7 +195,7 @@ function testAccount(account: string) {
         </FaButton>
         <div class="mt-4 flex-center gap-2 text-sm">
           <span class="text-secondary-foreground op-50">{{ t('noAccount') }}</span>
-          <FaButton variant="link" class="h-auto p-0" type="button" @click="emits('onRegister', form.values.account)">
+          <FaButton variant="link" class="h-auto p-0" type="button" @click="emits('onRegister', form.values.mobile)">
             {{ t('register') }}
           </FaButton>
         </div>

@@ -1,17 +1,16 @@
+/* eslint-disable perfectionist/sort-imports */
 import type { Route } from '#/global'
 import type { RouteRecordRaw } from 'vue-router'
 import { $t } from '@/locales'
 import pinia from '@/store'
 import useSettingsStore from '@/store/modules/settings'
-import generatedRoutes from 'virtual:generated-pages'
 import { setupLayouts } from 'virtual:meta-layouts'
+import generatedRoutes from 'virtual:generated-pages'
 import ActivityModule from './modules/activity.module'
 import DashboardModule from './modules/dashboard.module'
 import EcommerceModule from './modules/ecommerce.module'
 import FinanceModule from './modules/finance.module'
 import ModelModule from './modules/model.module'
-import MultilevelMenuExample from './modules/multilevel.menu.example'
-import NewModule from './modules/new.module'
 import SystemModule from './modules/system.module'
 import UserModule from './modules/user.module'
 
@@ -131,15 +130,6 @@ const asyncRoutes: Route.recordMainRaw[] = [
     },
     children: [
       SystemModule,
-    ],
-  },
-  {
-    meta: {
-      title: '新模块',
-      icon: 'i-uim:box',
-    },
-    children: [
-      NewModule,
     ],
   },
 ]

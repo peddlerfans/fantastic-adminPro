@@ -157,7 +157,30 @@ defineExpose({
           <ElForm :model="search" size="default" label-width="100px" inline-message inline class="search-form">
             <template v-for="item in props.searchItems" :key="item.key">
               <ElFormItem :label="item.label">
-                <component :is="item.component" v-model="search[item.key]" :placeholder="item.placeholder" v-bind="item" @keydown.enter="currentChange()" @clear="currentChange()" />
+                <template v-if="item.component === 'ElSelect'">
+                  <ElSelect
+                    v-model="search[item.key]"
+                    :placeholder="item.placeholder"
+                    :clearable="item.clearable"
+                    class="w-full"
+                  >
+                    <ElOption
+                      v-for="option in item.options"
+                      :key="option.value"
+                      :label="option.label"
+                      :value="option.value"
+                    />
+                  </ElSelect>
+                </template>
+                <component
+                  v-else
+                  :is="item.component"
+                  v-model="search[item.key]"
+                  :placeholder="item.placeholder"
+                  v-bind="item"
+                  @keydown.enter="currentChange()"
+                  @clear="currentChange()"
+                />
               </ElFormItem>
             </template>
             <ElFormItem>
@@ -195,11 +218,13 @@ defineExpose({
         <template v-for="column in props.columns" :key="column.prop">
           <ElTableColumn v-bind="column" :prop="column.prop" :label="column.label">
             <template #default="scope">
-              <slot :name="'col-' + column.prop" :row="scope.row">{{ scope.row[column.prop] }}</slot>
+              <slot :name="'col-' + column.prop" :row="scope.row">
+                {{ column.formatter ? column.formatter(scope.row) : scope.row[column.prop] }}
+              </slot>
             </template>
           </ElTableColumn>
         </template>
-        <ElTableColumn label="操作" width="250" align="center" fixed="right">
+        <ElTableColumn label="操作" width="180" align="center" fixed="right">
           <template #default="scope">
             <ElButton type="primary" size="small" plain @click="onEdit(scope.row)">
               编辑

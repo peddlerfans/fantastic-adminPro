@@ -1,64 +1,151 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
+import type { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import modelApi from "@/api/modules/model"
 import CrudTable from '@/components/CrudTable/index.vue'
 
-// 星级选项
-const starOptions = [
-  { label: '一星', value: '一星' },
-  { label: '二星', value: '二星' },
-  { label: '三星', value: '三星' },
-  { label: '四星', value: '四星' },
-  { label: '五星', value: '五星' },
+interface EliteRecord {
+  email: string
+  accountAddress: string
+  ranking: number
+  type: number
+  accessUserNum: number
+  accessNum: number
+  rewardNum: number
+  createTime: string
+  weekNum: number
+  startTime: string
+  endTime: string
+}
+
+interface EliteResponse {
+  records: EliteRecord[]
+  total: number
+}
+
+interface RequestParams {
+  email?: string
+  accountAddress?: string
+  type?: number
+  startTime?: string
+  endTime?: string
+  current?: number
+  size?: number
+}
+
+// 榜单类型选项
+const eliteTypeOptions = [
+  { label: '先锋榜（一星）', value: 1 },
+  { label: '荣耀榜（三星）', value: 2 },
 ]
 
-// 精英榜表格列
-const eliteColumns = [
-  { prop: 'email', label: '用户邮箱', minWidth: 140 },
-  { prop: 'address', label: '用户地址', minWidth: 140 },
-  { prop: 'rank', label: '排名', minWidth: 80 },
-  { prop: 'star', label: '星级', minWidth: 100 },
-  { prop: 'targetCount', label: '达标人数', minWidth: 100 },
-  { prop: 'statTime', label: '统计时间', minWidth: 140 },
-]
+// 表格列配置
+const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  { prop: 'ranking', label: '排名', minWidth: 80 },
+  {
+    prop: 'type',
+    label: '榜单类型',
+    minWidth: 140,
+    formatter: (row: EliteRecord) => {
+      const option = eliteTypeOptions.find(opt => opt.value === row.type)
+      return option ? option.label : '-'
+    }
+  },
+  { prop: 'accessUserNum', label: '达标人数', minWidth: 100 },
+  { prop: 'accessNum', label: '奖励份数', minWidth: 100 },
+  {
+    prop: 'rewardNum',
+    label: '奖励金额',
+    minWidth: 120,
+    formatter: (row: EliteRecord) => {
+      return row.rewardNum ? row.rewardNum.toFixed(8) : '-'
+    }
+  },
+  { prop: 'weekNum', label: '自然周数', minWidth: 100 },
+  {
+    prop: 'startTime',
+    label: '周期开始时间',
+    minWidth: 160,
+    formatter: (row: EliteRecord) => {
+      if (!row.startTime) return '-'
+      return new Date(row.startTime).toLocaleString()
+    }
+  },
+  {
+    prop: 'endTime',
+    label: '周期结束时间',
+    minWidth: 160,
+    formatter: (row: EliteRecord) => {
+      if (!row.endTime) return '-'
+      return new Date(row.endTime).toLocaleString()
+    }
+  },
+  {
+    prop: 'createTime',
+    label: '创建时间',
+    minWidth: 160,
+    formatter: (row: EliteRecord) => {
+      if (!row.createTime) return '-'
+      return new Date(row.createTime).toLocaleString()
+    }
+  },
+])
 
 // 查询项
-const eliteSearchItems = [
-  { key: 'address', label: '用户地址', component: 'ElInput', placeholder: '请输入用户地址' },
+const searchItems = ref([
   { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'star', label: '星级', component: 'ElSelect', options: starOptions, placeholder: '请选择星级', multiple: true, clearable: true },
-]
+  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  {
+    key: 'type',
+    label: '榜单类型',
+    component: 'ElSelect',
+    options: eliteTypeOptions,
+    placeholder: '请选择榜单类型',
+    clearable: true
+  },
+  {
+    key: 'startTime',
+    label: '开始时间',
+    component: 'ElDatePicker',
+    type: 'datetime',
+    placeholder: '请选择开始时间',
+    valueFormat: 'YYYY-MM-DD HH:mm:ss'
+  },
+  {
+    key: 'endTime',
+    label: '结束时间',
+    component: 'ElDatePicker',
+    type: 'datetime',
+    placeholder: '请选择结束时间',
+    valueFormat: 'YYYY-MM-DD HH:mm:ss'
+  },
+])
 
-// mock 数据
-const eliteMockList = Array.from({ length: 20 }).map((_, i) => ({
-  email: `user${i + 1}@example.com`,
-  address: `0x${Math.random().toString(16).slice(2, 18)}`,
-  rank: i + 1,
-  star: starOptions[i % 5].value,
-  targetCount: Math.floor(Math.random() * 100),
-  statTime: `2024-06-0${(i % 9) + 1} 10:00:00`,
-}))
-
-// 数据请求（带筛选）
-function eliteRequestData(params: any) {
-  let list = [...eliteMockList]
-  if (params.address) {
-    list = list.filter(item => item.address.includes(params.address))
-  }
-  if (params.email) {
-    list = list.filter(item => item.email.includes(params.email))
-  }
-  if (params.star && params.star.length) {
-    list = list.filter(item => params.star.includes(item.star))
-  }
-  // 排序（可根据rank字段排序）
-  list = list.sort((a, b) => a.rank - b.rank)
-  // 分页
-  const { page = 1, size = 10 } = params
-  const start = (page - 1) * size
-  const end = start + size
-  return Promise.resolve({
+// 数据请求
+function requestData(params: RequestParams) {
+  return modelApi.getEliteList({
+    email: params.email,
+    accountAddress: params.accountAddress,
+    type: params.type,
+    startTime: params.startTime,
+    endTime: params.endTime,
+    current: params.current || 1,
+    size: params.size || 10,
+  }).then((res: AxiosResponse<EliteResponse>) => ({
     data: {
-      list: list.slice(start, end),
-      total: list.length,
+      list: res.data.records,
+      total: res.data.total,
+    }
+  })).catch((error: unknown) => {
+    console.error('获取精英榜列表失败:', error)
+    return {
+      data: {
+        list: [] as EliteRecord[],
+        total: 0,
+      }
     }
   })
 }
@@ -67,9 +154,9 @@ function eliteRequestData(params: any) {
 <template>
   <FaCard title="精英榜列表" class="mt-4">
     <CrudTable
-      :columns="eliteColumns"
-      :search-items="eliteSearchItems"
-      :request="eliteRequestData"
+      :columns="columns"
+      :search-items="searchItems"
+      :request="requestData"
       :batch-enabled="false"
     />
   </FaCard>
