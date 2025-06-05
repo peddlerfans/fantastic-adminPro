@@ -82,6 +82,5 @@ declare module 'vue' {
     PcasCascader: typeof import('./../components/PcasCascader/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Table: typeof import('./../components/Table/index.vue')['default']
   }
 }
