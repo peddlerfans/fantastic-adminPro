@@ -64,15 +64,15 @@
 </i18n>
 
 <script setup lang="ts">
-import useUserStore from '@/store/modules/user'
-import { FormControl, FormField, FormItem, FormMessage } from '@/ui/shadcn/ui/form'
-import storage from '@/utils/storage'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
-import * as z from 'zod'
 import { useRouter } from 'vue-router'
+import * as z from 'zod'
 import useSettingsStore from '@/store/modules/settings'
+import useUserStore from '@/store/modules/user'
+import { FormControl, FormField, FormItem, FormMessage } from '@/ui/shadcn/ui/form'
+import storage from '@/utils/storage'
 
 defineOptions({
   name: 'LoginForm',
@@ -126,12 +126,6 @@ const onSubmit = form.handleSubmit((values) => {
     loading.value = false
   })
 })
-
-function testAccount(mobile: string) {
-  form.setFieldValue('mobile', mobile)
-  form.setFieldValue('password', '123456')
-  onSubmit()
-}
 </script>
 
 <template>
@@ -144,14 +138,14 @@ function testAccount(mobile: string) {
         {{ title }}
       </p>
     </FaBlurReveal>
-    <div class="mb-4">
+    <!-- <div class="mb-4">
       <FaTabs
         v-model="type" :list="[
           { label: t('accountLogin'), value: 'default' },
           { label: t('qrcodeLogin'), value: 'qrcode' },
         ]" class="inline-flex"
       />
-    </div>
+    </div> -->
     <div v-show="type === 'default'">
       <form @submit="onSubmit">
         <FormField v-slot="{ componentField, errors }" name="mobile">
@@ -193,14 +187,14 @@ function testAccount(mobile: string) {
         <FaButton :loading="loading" size="lg" class="w-full" type="submit">
           {{ t('form.login') }}
         </FaButton>
-        <div class="mt-4 flex-center gap-2 text-sm">
+        <!-- <div class="mt-4 flex-center gap-2 text-sm">
           <span class="text-secondary-foreground op-50">{{ t('noAccount') }}</span>
           <FaButton variant="link" class="h-auto p-0" type="button" @click="emits('onRegister', form.values.mobile)">
             {{ t('register') }}
           </FaButton>
-        </div>
+        </div> -->
       </form>
-      <div class="mt-4 text-center -mb-4">
+      <!-- <div class="mt-4 text-center -mb-4">
         <FaDivider>{{ t('testLogin') }}</FaDivider>
         <div class="space-x-2">
           <FaButton variant="default" size="sm" plain @click="testAccount('admin')">
@@ -210,7 +204,7 @@ function testAccount(mobile: string) {
             test
           </FaButton>
         </div>
-      </div>
+      </div> -->
     </div>
     <div v-show="type === 'qrcode'">
       <div class="flex-col-center">
