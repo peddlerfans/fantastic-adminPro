@@ -33,7 +33,9 @@ export default defineConfig(({ mode, command }) => {
     // 构建选项 https://cn.vitejs.dev/config/build-options
     build: {
       outDir: mode === 'production' ? 'dist' : `dist-${mode}`,
-      sourcemap: env.VITE_BUILD_SOURCEMAP === 'true',
+      // sourcemap: env.VITE_BUILD_SOURCEMAP === 'true',
+      sourcemap: false,
+      external: ['vue-tsc'] // 防止隐式调用
     },
     define: {
       __SYSTEM_INFO__: JSON.stringify({

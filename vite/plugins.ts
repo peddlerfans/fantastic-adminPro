@@ -43,7 +43,7 @@ export default function createVitePlugins(mode: string, isBuild = false) {
     }),
 
     envParse({
-      dtsPath: 'src/types/env.d.ts',
+      dtsPath: '',
     }),
 
     // https://github.com/unplugin/unplugin-auto-import
@@ -53,7 +53,7 @@ export default function createVitePlugins(mode: string, isBuild = false) {
         'vue-router',
         'pinia',
       ],
-      dts: './src/types/auto-imports.d.ts',
+      dts: false,
       dirs: [
         './src/utils/composables/**',
       ],
@@ -65,7 +65,7 @@ export default function createVitePlugins(mode: string, isBuild = false) {
         'src/ui/components/*/index.vue',
         'src/components/*/index.vue',
       ],
-      dts: './src/types/components.d.ts',
+      dts: false,
     }),
 
     Unocss(),

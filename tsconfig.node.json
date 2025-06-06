@@ -23,7 +23,7 @@
     "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noEmit": true,
+    "noEmit": false,
     "isolatedModules": true,
     "skipLibCheck": true
   },

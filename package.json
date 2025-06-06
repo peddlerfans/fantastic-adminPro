@@ -6,8 +6,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "build:test": "vue-tsc -b && vite build --mode test",
+    "build": "vite build",
+    "build:test": "vite build --mode test",
+    "type-check": "vue-tsc --noEmit",
     "serve": "http-server ./dist -o",
     "serve:test": "http-server ./dist-test -o",
     "svgo": "svgo -f src/assets/icons",

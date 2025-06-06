@@ -30,7 +30,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noEmit": true,
+    "noEmit": false,
     "sourceMap": true,
     "esModuleInterop": true
   },

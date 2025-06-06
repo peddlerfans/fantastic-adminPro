@@ -2,6 +2,14 @@
   // 此处配置是为了满足 shadcn-vue CLI 的配置要求
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
+    "declaration": false, // 关闭 .d.ts 生成
+    "declarationMap": false, // 关闭 .d.ts.map 生成
+    "emitDeclarationOnly": false, // 确保不强制生成声明文件
+    "isolatedModules": true, // 避免 TS 因跨文件类型检查报错
+    "skipLibCheck": true, // 跳过库文件检查
+    "noEmit": true, // 禁止 TS 输出文件
+    "allowImportingTsExtensions": false, // 显式关闭
+    "composite": false, // 禁用复合项目模式
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -9,18 +17,15 @@
       ]
     }
   },
+  "exclude": [
+    "**/*.vue",
+    "node_modules",
+    "dist"
+  ],
   "references": [
     {
       "path": "./tsconfig.app.json"
     }
   ],
-  "files": [],
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "components.d.ts",
-    "types/*.d.ts"
-  ]
+  "files": []
 }
