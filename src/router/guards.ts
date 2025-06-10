@@ -1,4 +1,5 @@
 import type { Router } from 'vue-router'
+import { useNProgress } from '@vueuse/integrations/useNProgress'
 import useFavoritesStore from '@/store/modules/favorites'
 import useIframeStore from '@/store/modules/iframe'
 import useKeepAliveStore from '@/store/modules/keepAlive'
@@ -7,8 +8,7 @@ import useRouteStore from '@/store/modules/route'
 import useSettingsStore from '@/store/modules/settings'
 import useTabbarStore from '@/store/modules/tabbar'
 import useUserStore from '@/store/modules/user'
-import { useNProgress } from '@vueuse/integrations/useNProgress'
-import { asyncRoutes, asyncRoutesByFilesystem, getFinalRoutes, systemRoutes } from './routes'
+import { asyncRoutes, asyncRoutesByFilesystem, getFinalRoutes } from './routes'
 import '@/assets/styles/nprogress.css'
 
 function setupRoutes(router: Router) {
@@ -26,17 +26,19 @@ function setupRoutes(router: Router) {
       if (routeStore.isGenerate) {
         // 导航栏如果不是 single 模式，则需要根据 path 定位主导航的选中状态
         settingsStore.settings.menu.mode !== 'single' && menuStore.setActived(to.path)
+        // 确保路由生成成功
+        await routeStore.generateRoutesAtFront(asyncRoutes)
         // 添加这个检查避免循环
         if (to.path === settingsStore.settings.home.fullPath) {
           return next() // 已经是目标路径就直接放行
         }
         // 如果已登录状态下，进入登录页会强制跳转到主页
         if (to.name === 'login') {
-          // next({
-          //   path: settingsStore.settings.home.fullPath,
-          //   replace: true,
-          // })
-          return next({ path: "/", replace: true })
+          next({
+            path: settingsStore.settings.home.fullPath,
+            replace: true,
+          })
+          // return next({ path: "/", replace: true })
         }
         // 如果未开启主页，但进入的是主页，则会进入第一个固定标签页或者侧边栏导航第一个模块
         else if (!settingsStore.settings.home.enable && to.fullPath === settingsStore.settings.home.fullPath) {

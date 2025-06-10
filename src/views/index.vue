@@ -109,7 +109,7 @@ function open(url: string) {
       <FaPageMain class="m-0 flex-1" title-class="flex flex-wrap items-center justify-between gap-4">
         <template #title>
           <div class="title-info">
-            <img src="https://cn.vuejs.org/logo.svg">
+            <img src="https://cn.vuejs.org/logo.png">
             <div>
               <h1 class="c-[#41b883]">
                 Fantastic-startkit
@@ -132,7 +132,7 @@ function open(url: string) {
       <FaPageMain class="m-0 flex-1" title-class="flex flex-wrap items-center justify-between gap-4" main-class="flex-1">
         <template #title>
           <div class="title-info">
-            <img src="https://fantastic-admin.hurui.me/logo.svg">
+            <img src="https://fantastic-admin.hurui.me/logo.png">
             <div>
               <h1 class="c-[#41b883]">
                 Fantastic-admin

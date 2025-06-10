@@ -75,7 +75,7 @@ export default defineConfig(({ mode, command }) => {
       },
     },
     optimizeDeps: {
-      exclude: ['@visactor/vchart']
+      include: ['@visactor/vchart']
     }
   }
 }

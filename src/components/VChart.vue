@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VChart as VChartClass } from '@visactor/vchart'
+import VChartClass from '@visactor/vchart'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = defineProps<{
@@ -17,7 +17,7 @@ function safeDispose() {
   if (chartInstance.value) {
     try {
       chartInstance.value.release()
-    } 
+    }
     catch (e) {
       console.warn('图表销毁异常:', e)
     }
