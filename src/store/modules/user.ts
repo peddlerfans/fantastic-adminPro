@@ -2,6 +2,7 @@ import type { Settings } from '#/global'
 import { cloneDeep } from 'es-toolkit'
 import apiUser from '@/api/modules/user'
 import router from '@/router'
+import { asyncRoutes } from '@/router/routes'
 import settingsDefault from '@/settings'
 import eventBus from '@/utils/eventBus'
 import { diffTwoObj, mergeWithoutUndefinedProps } from '@/utils/object'
@@ -47,6 +48,11 @@ const useUserStore = defineStore(
       const defaultAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${data.mobile}`
       storage.local.set('avatar', defaultAvatar)
       avatar.value = defaultAvatar
+
+      // 确保路由生成成功
+      if (!routeStore.isGenerate) {
+        await routeStore.generateRoutesAtFront(asyncRoutes)
+      }
     }
 
     // 手动登出
@@ -54,6 +60,7 @@ const useUserStore = defineStore(
       // 此处仅清除计算属性 isLogin 中判断登录状态过期的变量，以保证在弹出登录窗口模式下页面展示依旧正常
       storage.local.remove('token')
       token.value = ''
+      routeStore.removeRoutes()
       router.push({
         name: 'login',
         query: {

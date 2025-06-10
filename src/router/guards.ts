@@ -8,7 +8,7 @@ import useSettingsStore from '@/store/modules/settings'
 import useTabbarStore from '@/store/modules/tabbar'
 import useUserStore from '@/store/modules/user'
 import { useNProgress } from '@vueuse/integrations/useNProgress'
-import { asyncRoutes, asyncRoutesByFilesystem } from './routes'
+import { asyncRoutes, asyncRoutesByFilesystem, getFinalRoutes, systemRoutes } from './routes'
 import '@/assets/styles/nprogress.css'
 
 function setupRoutes(router: Router) {
@@ -19,18 +19,24 @@ function setupRoutes(router: Router) {
     const menuStore = useMenuStore()
     const tabbarStore = useTabbarStore()
     const favoritesStore = useFavoritesStore()
+
     // 是否已登录
     if (userStore.isLogin) {
       // 是否已根据权限动态生成并注册路由
       if (routeStore.isGenerate) {
         // 导航栏如果不是 single 模式，则需要根据 path 定位主导航的选中状态
         settingsStore.settings.menu.mode !== 'single' && menuStore.setActived(to.path)
+        // 添加这个检查避免循环
+        if (to.path === settingsStore.settings.home.fullPath) {
+          return next() // 已经是目标路径就直接放行
+        }
         // 如果已登录状态下，进入登录页会强制跳转到主页
         if (to.name === 'login') {
-          next({
-            path: settingsStore.settings.home.fullPath,
-            replace: true,
-          })
+          // next({
+          //   path: settingsStore.settings.home.fullPath,
+          //   replace: true,
+          // })
+          return next({ path: "/", replace: true })
         }
         // 如果未开启主页，但进入的是主页，则会进入第一个固定标签页或者侧边栏导航第一个模块
         else if (!settingsStore.settings.home.enable && to.fullPath === settingsStore.settings.home.fullPath) {
@@ -67,6 +73,7 @@ function setupRoutes(router: Router) {
           settingsStore.settings.tabbar.enable && await tabbarStore.recoveryStorage()
           // 复原收藏夹
           settingsStore.settings.toolbar.favorites && await favoritesStore.recoveryStorage()
+
           // 生成动态路由
           switch (settingsStore.settings.app.routeBaseOn) {
             case 'frontend':
@@ -88,30 +95,55 @@ function setupRoutes(router: Router) {
               }
               break
           }
-          // 注册并记录路由数据
-          // 记录的数据会在登出时会使用到，不使用 router.removeRoute 是考虑配置的路由可能不一定有设置 name ，则通过调用 router.addRoute() 返回的回调进行删除
-          const removeRoutes: (() => void)[] = []
-          routeStore.routes.forEach((route) => {
-            if (!/^(?:https?:|mailto:|tel:)/.test(route.path)) {
-              removeRoutes.push(router.addRoute(route))
+
+          // // 注册并记录路由数据
+          // const removeRoutes: (() => void)[] = []
+          // routeStore.routes.forEach((route) => {
+          //   if (!/^(?:https?:|mailto:|tel:)/.test(route.path)) {
+          //     removeRoutes.push(router.addRoute(route))
+          //   }
+          // })
+          // if (settingsStore.settings.app.routeBaseOn !== 'filesystem') {
+          //   routeStore.systemRoutes.forEach((route) => {
+          //     removeRoutes.push(router.addRoute(route))
+          //   })
+          // }
+          // routeStore.setCurrentRemoveRoutes(removeRoutes)
+
+          // 1. 清除旧路由
+          routeStore.removeRoutes()
+
+          // 2. 生成新路由（使用getFinalRoutes获取完整路由）
+          const finalRoutes = getFinalRoutes()
+          finalRoutes.forEach((route) => {
+            return router.addRoute(route)
+          })
+
+          // 3. 标记路由已生成
+          routeStore.isGenerate = true
+
+          // 4. 重新触发当前导航
+          return next(to.fullPath)
+
+          // 重新进入当前路由
+          // if (to.path === '/') {
+          //   next({
+          //     path: settingsStore.settings.home.fullPath,
+          //     replace: true,
+          //   })
+          // } else {
+          //   next()
+          // }
+        }
+        catch (error) {
+          console.error('路由生成失败:', error)
+          next({
+            name: 'error',
+            query: {
+              message: '路由生成失败，请刷新页面重试'
             }
           })
-          if (settingsStore.settings.app.routeBaseOn !== 'filesystem') {
-            routeStore.systemRoutes.forEach((route) => {
-              removeRoutes.push(router.addRoute(route))
-            })
-          }
-          routeStore.setCurrentRemoveRoutes(removeRoutes)
         }
-        catch {
-          userStore.logout()
-        }
-        // 动态路由生成并注册后，重新进入当前路由
-        next({
-          path: to.path,
-          query: to.query,
-          replace: true,
-        })
       }
     }
     else {

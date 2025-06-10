@@ -184,7 +184,7 @@ const useRouteStore = defineStore(
         if (settingsStore.settings.tabbar.enable) {
           tabbarStore.initPermanentTab()
         }
-      }).catch(() => {})
+      }).catch(() => { })
     }
     // 生成路由（文件系统生成）
     function generateRoutesAtFilesystem(asyncRoutes: RouteRecordRaw[]) {
@@ -208,6 +208,8 @@ const useRouteStore = defineStore(
         removeRoute()
       })
       currentRemoveRoutes.value = []
+      // ✅ 重置匹配器（与 Vue Router 同步）
+      // routesMatcher.value = createRouterMatcher([], {}) // 初始化为空匹配器
     }
 
     return {

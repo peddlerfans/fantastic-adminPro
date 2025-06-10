@@ -1,5 +1,4 @@
-<i18n lang="json">
-{
+<i18n lang="json">{
   "zh-cn": {
     "accountLogin": "账号密码登录",
     "qrcodeLogin": "扫码登录",
@@ -60,8 +59,7 @@
       "password": "Please enter the password"
     }
   }
-}
-</i18n>
+}</i18n>
 
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
@@ -120,8 +118,17 @@ const onSubmit = form.handleSubmit((values) => {
     else {
       storage.local.remove('login_account')
     }
-    router.push(settingsStore.settings.home.fullPath)
-    emits('onLogin', values.mobile)
+    if (router.currentRoute.value.path !== settingsStore.settings.home.fullPath) {
+      router.push(settingsStore.settings.home.fullPath)
+      // window.location.href = settingsStore.settings.home.fullPath;
+      // router.push('/').catch(() => {
+      //   // 如果跳转失败（可能路由未加载），强制刷新
+      //   window.location.href = '/'
+      // })
+    }
+    nextTick(() => {
+      emits('onLogin', values.mobile)
+    })
   }).finally(() => {
     loading.value = false
   })
@@ -151,9 +158,11 @@ const onSubmit = form.handleSubmit((values) => {
         <FormField v-slot="{ componentField, errors }" name="mobile">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
-              <FaInput type="text" :placeholder="t('form.mobile')" class="w-full" :class="errors.length && 'border-destructive'" v-bind="componentField" />
+              <FaInput type="text" :placeholder="t('form.mobile')" class="w-full"
+                :class="errors.length && 'border-destructive'" v-bind="componentField" />
             </FormControl>
-            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0" leave-active-class="transition-opacity" leave-to-class="opacity-0">
+            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0">
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
@@ -161,9 +170,11 @@ const onSubmit = form.handleSubmit((values) => {
         <FormField v-slot="{ componentField, errors }" name="password">
           <FormItem class="relative pb-6 space-y-0">
             <FormControl>
-              <FaInput type="password" :placeholder="t('form.password')" class="w-full" :class="errors.length && 'border-destructive'" v-bind="componentField" />
+              <FaInput type="password" :placeholder="t('form.password')" class="w-full"
+                :class="errors.length && 'border-destructive'" v-bind="componentField" />
             </FormControl>
-            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0" leave-active-class="transition-opacity" leave-to-class="opacity-0">
+            <Transition enter-active-class="transition-opacity" enter-from-class="opacity-0"
+              leave-active-class="transition-opacity" leave-to-class="opacity-0">
               <FormMessage class="absolute bottom-1 text-xs" />
             </Transition>
           </FormItem>
@@ -180,7 +191,8 @@ const onSubmit = form.handleSubmit((values) => {
               </FormItem>
             </FormField>
           </div>
-          <FaButton variant="link" class="h-auto p-0" type="button" @click="emits('onResetPassword', form.values.mobile)">
+          <FaButton variant="link" class="h-auto p-0" type="button"
+            @click="emits('onResetPassword', form.values.mobile)">
             {{ t('forget') }}
           </FaButton>
         </div>

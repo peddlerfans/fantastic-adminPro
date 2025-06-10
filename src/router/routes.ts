@@ -1,3 +1,5 @@
+/* eslint-disable style/indent */
+/* eslint-disable style/multiline-ternary */
 /* eslint-disable perfectionist/sort-imports */
 import type { Route } from '#/global'
 import type { RouteRecordRaw } from 'vue-router'
@@ -26,44 +28,45 @@ const constantRoutes: RouteRecordRaw[] = [
       title: $t('app.route.login'),
     },
   },
-  {
-    path: '/:all(.*)*',
-    name: 'notFound',
-    component: () => import('@/views/[...all].vue'),
-    meta: {
-      title: '找不到页面',
-    },
-  },
+  // {
+  //   path: '/:all(.*)*',
+  //   name: 'notFound',
+  //   component: () => import('@/views/[...all].vue'),
+  //   meta: {
+  //     title: '找不到页面',
+  //   },
+  // },
 ]
 
 // 系统路由
 const systemRoutes: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'root',
     component: () => import('@/layouts/index.vue'),
-    meta: {
-      breadcrumb: false,
-    },
+    redirect: '/dashboard/user',
     children: [
       {
-        path: '',
+        path: 'dashboard/user',
+        name: 'dashboardUser',
         component: () => import('@/views/dashboard/user.vue'),
         meta: {
-          title: $t(useSettingsStore(pinia).settings.home.title),
-          icon: 'i-ant-design:home-twotone',
-          breadcrumb: false,
-        },
-      },
-      {
-        path: 'reload',
-        name: 'reload',
-        component: () => import('@/views/reload.vue'),
-        meta: {
-          title: $t('app.route.reload'),
-          breadcrumb: false,
+          title: '用户统计',
+          icon: 'mdi:account-group',
+          auth: ['dashboard:user'],
         },
       },
     ],
+  },
+  {
+    path: '/reload',
+    name: 'reload',
+    component: () => import('@/views/reload.vue'),
+    meta: {
+      title: '重新加载',
+      icon: 'mdi:reload',
+      auth: ['reload'],
+    },
   },
 ]
 
@@ -148,4 +151,23 @@ export {
   constantRoutes,
   constantRoutesByFilesystem,
   systemRoutes,
+}
+
+// 新增方法：获取完整路由（在路由守卫中使用）
+export function getFinalRoutes() {
+  return [
+    ...systemRoutes,
+    ...asyncRoutes.flatMap(route => route.children || []),
+    // 生产环境最后添加404路由
+    // eslint-disable-next-line node/prefer-global/process
+    ...(process.env.NODE_ENV === 'production'
+      ? [{
+        path: '/:all(.*)*',
+        name: 'notFound',
+        component: () => import('@/views/[...all].vue'),
+        meta: {
+          title: '找不到页面',
+        },
+      }] : [])
+  ]
 }

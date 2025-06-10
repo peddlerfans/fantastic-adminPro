@@ -25,16 +25,27 @@ export default defineConfig(({ mode, command }) => {
       proxy: {
         '/proxy': {
           target: env.VITE_APP_API_BASEURL,
-          changeOrigin: command === 'serve' && env.VITE_OPEN_PROXY === 'true',
+          changeOrigin: true,
           rewrite: path => path.replace(/\/proxy/, ''),
         },
       },
     },
     // 构建选项 https://cn.vitejs.dev/config/build-options
     build: {
+      target: 'esnext', // ✅ 必须使用 ESNext 特性
       outDir: mode === 'production' ? 'dist' : `dist-${mode}`,
       // sourcemap: env.VITE_BUILD_SOURCEMAP === 'true',
       sourcemap: false,
+      rollupOptions: {
+        output: {
+          // ✅ 确保 WASM 文件被打包
+          manualChunks(id) {
+            if (/node_modules\/@visactor\/vchart/.test(id)) {
+              return 'vchart'
+            }
+          }
+        },
+      },
       external: ['vue-tsc'] // 防止隐式调用
     },
     define: {
@@ -63,5 +74,10 @@ export default defineConfig(({ mode, command }) => {
         },
       },
     },
+    optimizeDeps: {
+      exclude: ['@visactor/vchart']
+    }
   }
-})
+}
+)
+

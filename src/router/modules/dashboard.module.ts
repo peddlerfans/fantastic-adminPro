@@ -8,7 +8,6 @@ function Layout() {
 const routes: RouteRecordRaw = {
   path: '/dashboard',
   component: Layout,
-  redirect: '/dashboard/user',
   name: 'dashboard',
   meta: {
     title: $t('route.dashboard.root'),
