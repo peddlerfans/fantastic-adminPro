@@ -1,10 +1,11 @@
 export default function usePagination() {
   const pagination = ref({
     page: 1,
+    current: 1,
     size: 10,
     total: 0,
     sizes: [10, 20, 50, 100],
-    layout: 'total, sizes, ->, prev, pager, next, jumper',
+    layout: "total, sizes, ->, prev, pager, next, jumper",
     sort: null as string | null,
     order: null as string | null,
   })
@@ -13,14 +14,14 @@ export default function usePagination() {
     return {
       page: pagination.value.page,
       size: pagination.value.size,
+      current: pagination.value.current,
       from: (pagination.value.page - 1) * pagination.value.size,
       limit: pagination.value.size,
-      ...(
-        pagination.value.sort && pagination.value.order && {
-          sort: pagination.value.sort,
-          order: pagination.value.order,
-        }
-      ),
+      ...(pagination.value.sort
+        && pagination.value.order && {
+        sort: pagination.value.sort,
+        order: pagination.value.order,
+      }),
     }
   }
 
@@ -30,6 +31,7 @@ export default function usePagination() {
 
   async function onCurrentChange(page: number) {
     pagination.value.page = page
+    pagination.value.current = page
   }
 
   async function onSortChange(prop: string, order: string) {

@@ -4,7 +4,6 @@ meta:
 </route>
 
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { defineEmits, defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
 import usePagination from '@/utils/composables/usePagination'
 
@@ -52,14 +51,10 @@ const { pagination, getParams, onSizeChange, onCurrentChange, onSortChange } = u
 // 表格是否自适应高度
 const tableAutoHeight = ref(false)
 
-const formModeProps = ref({
-  visible: false,
-  id: '',
-})
 
 // 搜索
 const searchDefault = {}
-const search = ref<Record<string, any>>({});
+const search = ref<Record<string, any>>({})
 
 function searchReset() {
   Object.assign(search.value, searchDefault)
@@ -122,9 +117,6 @@ function sortChange({ prop, order }: { prop: string, order: string }) {
   onSortChange(prop, order).then(() => getDataList())
 }
 
-function onCreate() {
-  emit('create')
-}
 
 function onEdit(row: any) {
   emit('edit', row)
@@ -146,7 +138,6 @@ defineExpose({
   search,
   searchReset,
 })
-
 </script>
 
 <template>
@@ -173,8 +164,8 @@ defineExpose({
                   </ElSelect>
                 </template>
                 <component
-                  v-else
                   :is="item.component"
+                  v-else
                   v-model="search[item.key]"
                   :placeholder="item.placeholder"
                   v-bind="item"
@@ -205,20 +196,20 @@ defineExpose({
       </FaSearchBar>
       <ElDivider border-style="dashed" />
       <ElSpace wrap>
-        <ElButton type="primary" size="default" @click="onCreate">
+        <!-- <ElButton type="primary" size="default" @click="onCreate">
           <template #icon>
             <FaIcon name="i-ep:plus" />
           </template>
           新增标准模块
-        </ElButton>
-        <slot name="batch-operations" :selectionDataList="batch.selectionDataList"></slot>
+        </ElButton> -->
+        <slot name="batch-operations" :selection-data-list="batch.selectionDataList" />
       </ElSpace>
       <ElTable v-loading="loading" class="my-4" :data="dataList" stripe highlight-current-row border height="100%" @sort-change="sortChange" @selection-change="onSelectionChange">
         <ElTableColumn v-if="batch.enable" type="selection" align="center" fixed />
         <template v-for="column in props.columns" :key="column.prop">
           <ElTableColumn v-bind="column" :prop="column.prop" :label="column.label">
             <template #default="scope">
-              <slot :name="'col-' + column.prop" :row="scope.row">
+              <slot :name="`col-${column.prop}`" :row="scope.row">
                 {{ column.formatter ? column.formatter(scope.row) : scope.row[column.prop] }}
               </slot>
             </template>
@@ -232,7 +223,7 @@ defineExpose({
             <ElButton type="danger" size="small" plain @click="onDel(scope.row)">
               删除
             </ElButton>
-            <slot name="operation-buttons" :row="scope.row"></slot>
+            <slot name="operation-buttons" :row="scope.row" />
           </template>
         </ElTableColumn>
       </ElTable>
