@@ -64,7 +64,7 @@ function requestData(params: RequestParams) {
       list: res.data.records as UserInfo[],
       total: res.data.total
     }
-  })).catch(error => {
+  })).catch((error) => {
     console.error('获取用户列表失败:', error)
     return {
       data: {
@@ -101,11 +101,12 @@ function handleDelete(row: any) {
   }).catch(() => {})
 }
 
-function handleSelectionChange(selection: any[]) {
-  // TODO: 处理批量操作
-}
+// function handleSelectionChange(selection: any[]) {
+//   // TODO: 处理批量操作
+// }
 
 // 冻结账户操作
+// @selection-change="handleSelectionChange"
 function handleFreezeAccount(row: any) {
   ElMessageBox.confirm(`确认冻结用户「${row.username}」吗？`, '确认信息').then(() => {
     ElMessage.success(`模拟冻结用户: ${row.username}`)
@@ -130,13 +131,12 @@ function handleFormSuccess() {
       @create="handleCreate"
       @edit="handleEdit"
       @delete="handleDelete"
-      @selection-change="handleSelectionChange"
     >
       <!-- 在这里通过 slot 添加其他批量操作按钮 -->
-      <template #batch-operations="{ selectionDataList }">
-        <!-- 例如：批量冻结 -->
-        <!-- <ElButton :disabled="!selectionDataList.length" @click="handleBatchFreeze(selectionDataList)">批量冻结</ElButton> -->
-      </template>
+      <!-- <template #batch-operations="{ selectionDataList }"> -->
+      <!-- 例如：批量冻结 -->
+      <!-- <ElButton :disabled="!selectionDataList.length" @click="handleBatchFreeze(selectionDataList)">批量冻结</ElButton> -->
+      <!-- </template> -->
 
       <!-- 在这里通过 slot 添加操作列的其他按钮 -->
       <template #operation-buttons="{ row }">
@@ -148,9 +148,10 @@ function handleFormSuccess() {
 
       <!-- 如果需要自定义列的内容，可以使用具名 slot，slot名为 col-加上列的 prop -->
       <template #col-status="{ row }">
-        <ElTag :type="row.status === 1 ? 'success' : 'danger'">{{ row.status === 1 ? '正常' : '软删除' }}</ElTag>
+        <ElTag :type="row.status === 1 ? 'success' : 'danger'">
+          {{ row.status === 1 ? '正常' : '软删除' }}
+        </ElTag>
       </template>
-
     </CrudTable>
 
     <!-- 新增/编辑弹窗 -->

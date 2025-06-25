@@ -43,7 +43,7 @@ const eliteTypeOptions = [
 // 表格列配置
 const columns = ref([
   { prop: 'email', label: '用户邮箱', minWidth: 180 },
-  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  // { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
   { prop: 'ranking', label: '排名', minWidth: 80 },
   {
     prop: 'type',
@@ -97,7 +97,7 @@ const columns = ref([
 // 查询项
 const searchItems = ref([
   { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  // { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
   {
     key: 'type',
     label: '榜单类型',

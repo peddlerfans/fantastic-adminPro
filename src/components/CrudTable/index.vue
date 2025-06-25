@@ -57,6 +57,7 @@ const searchDefault = {}
 const search = ref<Record<string, any>>({})
 
 function searchReset() {
+  search.value = {}
   Object.assign(search.value, searchDefault)
   getDataList()
 }
@@ -118,14 +119,14 @@ function sortChange({ prop, order }: { prop: string, order: string }) {
 }
 
 
-function onEdit(row: any) {
-  emit('edit', row)
-}
+// function onEdit(row: any) {
+//   emit('edit', row)
+// }
 
-function onDel(row: any) {
-  // 这里只触发事件，具体的删除逻辑由父组件实现
-  emit('delete', row)
-}
+// function onDel(row: any) {
+//   // 这里只触发事件，具体的删除逻辑由父组件实现
+//   emit('delete', row)
+// }
 
 function onSelectionChange(selection: any[]) {
   batch.value.selectionDataList = selection
@@ -217,12 +218,12 @@ defineExpose({
         </template>
         <ElTableColumn label="操作" width="180" align="center" fixed="right">
           <template #default="scope">
-            <ElButton type="primary" size="small" plain @click="onEdit(scope.row)">
+            <!-- <ElButton type="primary" size="small" plain @click="onEdit(scope.row)">
               编辑
             </ElButton>
             <ElButton type="danger" size="small" plain @click="onDel(scope.row)">
               删除
-            </ElButton>
+            </ElButton> -->
             <slot name="operation-buttons" :row="scope.row" />
           </template>
         </ElTableColumn>

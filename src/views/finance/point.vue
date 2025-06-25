@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import type { AxiosResponse } from 'axios'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import newApi from "@/api/modules/new"
 import CrudTable from '@/components/CrudTable/index.vue'
 
@@ -27,7 +28,7 @@ interface RequestParams {
   current?: number
   size?: number
 }
-
+const { t } = useI18n()
 // 积分来源类型选项
 const pointTypeOptions = [
   { label: '步数', value: 'step' },
@@ -49,7 +50,14 @@ const columns = ref([
       return option ? option.label : row.type
     }
   },
-  { prop: 'type2', label: '积分子类型', minWidth: 120 },
+  {
+    prop: 'type2',
+    label: '积分子类型',
+    minWidth: 120,
+    formatter: (row: PointRecord) => {
+      return t(`tokenType2.${row.type2}`)
+    }
+  },
   {
     prop: 'amount',
     label: '积分数量',
@@ -81,7 +89,7 @@ const searchItems = ref([
     placeholder: '请选择积分来源类型',
     clearable: true
   },
-  { key: 'type2', label: '积分子类型', component: 'ElInput', placeholder: '请输入积分子类型' },
+  // { key: 'type2', label: '积分子类型', component: 'ElInput', placeholder: '请输入积分子类型' },
 ])
 
 // 数据请求
@@ -112,11 +120,6 @@ function requestData(params: RequestParams) {
 
 <template>
   <FaCard title="积分记录">
-    <CrudTable
-      :columns="columns"
-      :search-items="searchItems"
-      :request="requestData"
-      :batch-enabled="false"
-    />
+    <CrudTable :columns="columns" :search-items="searchItems" :request="requestData" :batch-enabled="false" />
   </FaCard>
 </template>

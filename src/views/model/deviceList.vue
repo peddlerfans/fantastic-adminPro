@@ -39,8 +39,11 @@ const statusOptions = [
 
 // 表格列配置
 const columns = ref([
+  { prop: 'email', label: '用户邮箱', minWidth: 180 },
   { prop: 'deviceName', label: '设备ID', minWidth: 180 },
   { prop: 'deviceNo', label: '设备编号', minWidth: 180 },
+  { prop: 'accountAddress', label: '用户地址', minWidth: 180 },
+
   {
     prop: 'deviceStatus',
     label: '设备状态',
@@ -74,8 +77,7 @@ const columns = ref([
       return row.isPledged === 1 ? '已质押' : '未质押'
     }
   },
-  { prop: 'accountAddress', label: '用户地址', minWidth: 180 },
-  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+
   {
     prop: 'expireStart',
     label: '激活时间',

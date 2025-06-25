@@ -26,6 +26,7 @@ interface RequestParams {
   date?: string
   current?: number
   size?: number
+  virtual?: number
 }
 
 // 步数来源选项
@@ -37,7 +38,7 @@ const virtualOptions = [
 // 表格列配置
 const columns = ref([
   { prop: 'email', label: '用户邮箱', minWidth: 180 },
-  { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
+  // { prop: 'accountAddress', label: '钱包地址', minWidth: 180 },
   {
     prop: 'virtual',
     label: '步数来源',
@@ -62,7 +63,7 @@ const columns = ref([
 // 查询项
 const searchItems = ref([
   { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
+  // { key: 'accountAddress', label: '钱包地址', component: 'ElInput', placeholder: '请输入钱包地址' },
   {
     key: 'virtual',
     label: '步数来源',
@@ -84,7 +85,7 @@ const searchItems = ref([
 // 数据请求
 function requestData(params: RequestParams) {
   return newApi.stepList({
-    type: params.type,
+    type: params.virtual,
     type2: params.type2,
     email: params.email,
     accountAddress: params.accountAddress,

@@ -1,9 +1,9 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts">
-import type { AxiosResponse } from 'axios'
-import { ref } from 'vue'
+import type { AxiosResponse } from "axios"
+import { ref } from "vue"
 import modelApi from "@/api/modules/model"
-import CrudTable from '@/components/CrudTable/index.vue'
+import CrudTable from "@/components/CrudTable/index.vue"
 
 interface VirtualDeviceRecord {
   deviceName: string
@@ -33,98 +33,119 @@ interface RequestParams {
 
 // 设备状态选项
 const statusOptions = [
-  { label: '正常', value: 1 },
-  { label: '失效', value: 0 },
+  { label: "正常", value: 1 },
+  { label: "失效", value: 0 },
 ]
 
 // 表格列配置
 const columns = ref([
-  { prop: 'deviceName', label: '设备ID', minWidth: 180 },
-  { prop: 'deviceNo', label: '设备编号', minWidth: 180 },
+  { prop: "email", label: "用户邮箱", minWidth: 180 },
+  { prop: "deviceName", label: "设备ID", minWidth: 180 },
+  { prop: "deviceNo", label: "设备编号", minWidth: 180 },
+  { prop: "accountAddress", label: "用户地址", minWidth: 180 },
   {
-    prop: 'deviceStatus',
-    label: '设备状态',
+    prop: "deviceStatus",
+    label: "设备状态",
     minWidth: 100,
     formatter: (row: VirtualDeviceRecord) => {
-      const option = statusOptions.find(opt => opt.value === row.deviceStatus)
-      return option ? option.label : '-'
-    }
+      const option = statusOptions.find(
+        opt => opt.value === row.deviceStatus
+      )
+      return option ? option.label : "-"
+    },
   },
   {
-    prop: 'isAuthorized',
-    label: '确权状态',
+    prop: "isAuthorized",
+    label: "确权状态",
     minWidth: 100,
     formatter: (row: VirtualDeviceRecord) => {
-      return row.isAuthorized === 1 ? '已确权' : '未确权'
-    }
+      return row.isAuthorized === 1 ? "已确权" : "未确权"
+    },
   },
   {
-    prop: 'point',
-    label: '积分',
+    prop: "point",
+    label: "积分",
     minWidth: 120,
     formatter: (row: VirtualDeviceRecord) => {
-      return row.point ? row.point.toFixed(8) : '-'
-    }
+      return row.point ? row.point.toFixed(8) : "-"
+    },
   },
   {
-    prop: 'isPledged',
-    label: '质押状态',
+    prop: "isPledged",
+    label: "质押状态",
     minWidth: 100,
     formatter: (row: VirtualDeviceRecord) => {
-      return row.isPledged === 1 ? '已质押' : '未质押'
-    }
+      return row.isPledged === 1 ? "已质押" : "未质押"
+    },
   },
-  { prop: 'accountAddress', label: '用户地址', minWidth: 180 },
-  { prop: 'email', label: '用户邮箱', minWidth: 180 },
+
   {
-    prop: 'expireStart',
-    label: '激活时间',
+    prop: "expireStart",
+    label: "激活时间",
     minWidth: 160,
     formatter: (row: VirtualDeviceRecord) => {
-      if (!row.expireStart) return '-'
+      if (!row.expireStart) return "-"
       return new Date(row.expireStart).toLocaleString()
-    }
+    },
   },
 ])
 
 // 查询项
 const searchItems = ref([
-  { key: 'email', label: '用户邮箱', component: 'ElInput', placeholder: '请输入用户邮箱' },
-  { key: 'accountAddress', label: '用户地址', component: 'ElInput', placeholder: '请输入用户地址' },
-  { key: 'deviceName', label: '设备ID', component: 'ElInput', placeholder: '请输入设备ID' },
   {
-    key: 'status',
-    label: '设备状态',
-    component: 'ElSelect',
+    key: "email",
+    label: "用户邮箱",
+    component: "ElInput",
+    placeholder: "请输入用户邮箱",
+  },
+  {
+    key: "accountAddress",
+    label: "用户地址",
+    component: "ElInput",
+    placeholder: "请输入用户地址",
+  },
+  {
+    key: "deviceName",
+    label: "设备ID",
+    component: "ElInput",
+    placeholder: "请输入设备ID",
+  },
+  {
+    key: "status",
+    label: "设备状态",
+    component: "ElSelect",
     options: statusOptions,
-    placeholder: '请选择设备状态',
-    clearable: true
+    placeholder: "请选择设备状态",
+    clearable: true,
   },
 ])
 
 // 数据请求
 function requestData(params: RequestParams) {
-  return modelApi.getVirtualDeviceList({
-    email: params.email,
-    accountAddress: params.accountAddress,
-    status: params.status,
-    deviceName: params.deviceName,
-    current: params.current || 1,
-    size: params.size || 10,
-  }).then((res: AxiosResponse<VirtualDeviceResponse>) => ({
-    data: {
-      list: res.data.records,
-      total: res.data.total,
-    }
-  })).catch((error: unknown) => {
-    console.error('获取虚拟设备列表失败:', error)
-    return {
+  return modelApi
+    .getVirtualDeviceList({
+      email: params.email,
+      accountAddress: params.accountAddress,
+      status: params.status,
+      deviceName: params.deviceName,
+      current: params.current || 1,
+      size: params.size || 10,
+    })
+    .then((res: AxiosResponse<VirtualDeviceResponse>) => ({
       data: {
-        list: [] as VirtualDeviceRecord[],
-        total: 0,
+        list: res.data.records,
+        total: res.data.total,
+      },
+    }))
+    .catch((error: unknown) => {
+      console.error("获取虚拟设备列表失败:", error)
+      return {
+        data: {
+          list: [] as VirtualDeviceRecord[],
+          total: 0,
+        },
       }
-    }
-  })
+    })
 }
 </script>
 

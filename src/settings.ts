@@ -10,10 +10,14 @@ const globalSettings: Settings.all = {
   home: {
     enable: false
   },
+  menu: {
+    enableHotkeys: true
+  },
   toolbar: {
     i18n: true,
     fullscreen: true,
     pageReload: true,
+    colorScheme: true,
     layout: [
       "favorites",
       "breadcrumb",
@@ -27,5 +31,4 @@ const globalSettings: Settings.all = {
     ]
   }
 }
-
 export default merge(globalSettings, cloneDeep(settingsDefault)) as RecursiveRequired<Settings.all>
